@@ -33,7 +33,7 @@ class LowerEightBitRegisterTestCase(unittest.TestCase):
     def setUp(self):
         self.combined_register = Register16bit()
         self.higher_register, self.lower_register = \
-            self.combined_register.eight_bit_registers()
+            self.combined_register.eight_bit_registers
 
     def test_default_register_data(self):
         self.assertEqual(self.lower_register.get(), 0)
@@ -70,7 +70,7 @@ class HigherEightBitRegisterTestCase(unittest.TestCase):
     def setUp(self):
         self.combined_register = Register16bit()
         self.higher_register, self.lower_register = \
-            self.combined_register.eight_bit_registers()
+            self.combined_register.eight_bit_registers
 
     def test_default_register_data(self):
         self.assertEqual(self.higher_register.get(), 0)
@@ -107,7 +107,7 @@ class FlagRegisterTestCase(unittest.TestCase):
     def setUp(self):
         self.combined_register = Register16bit(contains_flags=True)
         self.higher_register, self.flags_register = \
-            self.combined_register.eight_bit_registers()
+            self.combined_register.eight_bit_registers
 
     def test_default_register_data(self):
         self.assertEqual(self.higher_register.get(), 0)
@@ -180,6 +180,28 @@ class FlagRegisterTestCase(unittest.TestCase):
         self.assertFalse(self.flags_register.get_half_carry_flag())
         self.assertTrue(self.flags_register.get_carry_flag())
         self.flags_register.reset_carry_flag()
+        self.assertFalse(self.flags_register.get_zero_flag())
+        self.assertFalse(self.flags_register.get_negative_flag())
+        self.assertFalse(self.flags_register.get_half_carry_flag())
+        self.assertFalse(self.flags_register.get_carry_flag())
+
+    def test_set_all(self):
+        self.flags_register.set_all()
+        self.assertFalse(self.flags_register.get_zero_flag())
+        self.assertFalse(self.flags_register.get_negative_flag())
+        self.assertFalse(self.flags_register.get_half_carry_flag())
+        self.assertFalse(self.flags_register.get_carry_flag())
+        self.flags_register.set_all(True, True, True, True)
+        self.assertTrue(self.flags_register.get_zero_flag())
+        self.assertTrue(self.flags_register.get_negative_flag())
+        self.assertTrue(self.flags_register.get_half_carry_flag())
+        self.assertTrue(self.flags_register.get_carry_flag())
+        self.flags_register.set_all(zero=True, carry=True)
+        self.assertTrue(self.flags_register.get_zero_flag())
+        self.assertFalse(self.flags_register.get_negative_flag())
+        self.assertFalse(self.flags_register.get_half_carry_flag())
+        self.assertTrue(self.flags_register.get_carry_flag())
+        self.flags_register.set_all()
         self.assertFalse(self.flags_register.get_zero_flag())
         self.assertFalse(self.flags_register.get_negative_flag())
         self.assertFalse(self.flags_register.get_half_carry_flag())

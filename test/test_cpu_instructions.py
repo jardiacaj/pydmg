@@ -4,23 +4,160 @@ from cpu import CPU
 from ram import RAM
 
 
-class DefaultCPUTestCase(unittest.TestCase):
+class SimpleCPUInstructionTestCase(unittest.TestCase):
     def setUp(self):
         self.memory = RAM()
-        self.memory.data = [0]
         self.cpu = CPU(self.memory)
 
-    def testDefaultCPU(self):
-        self.assertEqual(self.cpu.total_clock_cycle_count, 0)
-        self.assertEqual(self.cpu.register_af.get(), 0)
-        self.assertEqual(self.cpu.register_a.get(), 0)
-        self.assertEqual(self.cpu.flags.get_zero_flag(), 0)
-
-    def testNOPTick(self):
+    def testNop(self):
+        self.memory.data = [0]
         self.cpu.tick()
         self.assertEqual(self.cpu.total_clock_cycle_count, 4)
         self.assertEqual(self.cpu.register_program_counter.get(), 1)
 
-    def testInvalidInstruction(self):
-        self.memory.data[0] = 0xFD
-        self.assertRaises(NotImplementedError, self.cpu.tick)
+    def test_INC_C(self):
+        self.memory.data = [0x0C]
+        self.cpu.tick()
+        self.assertEqual(self.cpu.total_clock_cycle_count, 4)
+        self.assertEqual(self.cpu.register_program_counter.get(), 1)
+        self.assertEqual(self.cpu.register_c.get(), 0x01)
+        self.assertFalse(self.cpu.flags.get_zero_flag())
+        self.assertFalse(self.cpu.flags.get_negative_flag())
+        self.assertFalse(self.cpu.flags.get_half_carry_flag())
+
+    def test_INC_C_half_carry(self):
+        self.memory.data = [0x0C]
+        self.cpu.register_c.set(0x0F)
+        self.cpu.tick()
+        self.assertEqual(self.cpu.total_clock_cycle_count, 4)
+        self.assertEqual(self.cpu.register_program_counter.get(), 1)
+        self.assertEqual(self.cpu.register_c.get(), 0x10)
+        self.assertFalse(self.cpu.flags.get_zero_flag())
+        self.assertFalse(self.cpu.flags.get_negative_flag())
+        self.assertTrue(self.cpu.flags.get_half_carry_flag())
+
+    def test_INC_C_zero(self):
+        self.memory.data = [0x0C]
+        self.cpu.register_c.set(0xFF)
+        self.cpu.tick()
+        self.assertEqual(self.cpu.total_clock_cycle_count, 4)
+        self.assertEqual(self.cpu.register_program_counter.get(), 1)
+        self.assertEqual(self.cpu.register_c.get(), 0x00)
+        self.assertTrue(self.cpu.flags.get_zero_flag())
+        self.assertFalse(self.cpu.flags.get_negative_flag())
+        self.assertFalse(self.cpu.flags.get_half_carry_flag())
+
+    def test_LD_C_A(self):
+        self.memory.data = [0x4F]
+        self.cpu.register_a.set(0x12)
+        self.cpu.tick()
+        self.assertEqual(self.cpu.total_clock_cycle_count, 4)
+        self.assertEqual(self.cpu.register_program_counter.get(), 1)
+        self.assertEqual(self.cpu.register_c.get(), 0x12)
+
+    def test_LD_BC_ADDR_A(self):
+        self.memory.data = [0x02]
+        self.cpu.register_a.set(0x12)
+        self.cpu.tick()
+        self.assertEqual(self.cpu.total_clock_cycle_count, 8)
+        self.assertEqual(self.cpu.register_program_counter.get(), 1)
+        self.assertEqual(self.memory.read(0x0000), 0x12)
+
+    def test_LD_IMM_ADDR_A(self):
+        self.memory.data = [0xEA, 0x02, 0x00]
+        self.cpu.register_a.set(0x12)
+        self.cpu.tick()
+        self.assertEqual(self.cpu.total_clock_cycle_count, 16)
+        self.assertEqual(self.cpu.register_program_counter.get(), 3)
+        self.assertEqual(self.memory.read(0x0002), 0x12)
+
+    def test_LD__C__A(self):
+        # We need big memory to make the write
+        self.memory.data = [0xE2] + [0]*65316
+        self.cpu.register_a.set(0x12)
+        self.cpu.register_c.set(0x24)
+        self.cpu.tick()
+        self.assertEqual(self.cpu.total_clock_cycle_count, 8)
+        self.assertEqual(self.cpu.register_program_counter.get(), 1)
+        self.assertEqual(self.memory.read(0xFF24), 0x12)
+
+    def test_LD_C_D8(self):
+        self.memory.data = [0x0E, 0xFE]
+        self.cpu.tick()
+        self.assertEqual(self.cpu.total_clock_cycle_count, 8)
+        self.assertEqual(self.cpu.register_program_counter.get(), 2)
+        self.assertEqual(self.cpu.register_c.get(), 0xFE)
+
+    def test_LDH_N_A(self):
+        self.memory.data = [0xE0, 0x12] + [0]*65316
+        self.cpu.register_a.set(0x24)
+        self.cpu.tick()
+        self.assertEqual(self.cpu.total_clock_cycle_count, 12)
+        self.assertEqual(self.cpu.register_program_counter.get(), 2)
+        self.assertEqual(self.memory.read(0xFF12), 0x24)
+
+    def test_JR_NZ_dont_jump(self):
+        self.memory.data = [0x20, 0xFE]  # JR NZ, -2
+        self.cpu.flags.reset_zero_flag()
+        self.cpu.tick()
+        self.assertEqual(self.cpu.total_clock_cycle_count, 8)
+        self.assertEqual(self.cpu.register_program_counter.get(), 2)
+
+    def test_JR_NZ_do_jump(self):
+        self.memory.data = [0x20, 0xFE]  # JR NZ, -2
+        self.cpu.flags.set_zero_flag()
+        self.cpu.tick()
+        self.assertEqual(self.cpu.total_clock_cycle_count, 8)
+        self.assertEqual(self.cpu.register_program_counter.get(), 0)
+
+    def test_LD_HL_D16(self):
+        self.memory.data = [0x21, 0x34, 0x12]
+        self.cpu.tick()
+        self.assertEqual(self.cpu.total_clock_cycle_count, 12)
+        self.assertEqual(self.cpu.register_program_counter.get(), 3)
+        self.assertEqual(self.cpu.register_hl.get(), 0x1234)
+
+    def test_LD_SP_D16(self):
+        self.memory.data = [0x31, 0x34, 0x12]
+        self.cpu.tick()
+        self.assertEqual(self.cpu.total_clock_cycle_count, 12)
+        self.assertEqual(self.cpu.register_program_counter.get(), 3)
+        self.assertEqual(self.cpu.register_stack_pointer.get(), 0x1234)
+
+    def test_LDD_HL_A(self):
+        self.memory.data = [0x32, 0x00]
+        self.cpu.register_a.set(0x12)
+        self.cpu.register_hl.set(0x1)
+        self.cpu.tick()
+        self.assertEqual(self.cpu.total_clock_cycle_count, 8)
+        self.assertEqual(self.cpu.register_program_counter.get(), 1)
+        self.assertEqual(self.cpu.register_hl.get(), 0)
+        self.assertEqual(self.cpu.memory.read(0x1), 0x12)
+
+    def test_XOR_A(self):
+        self.memory.data = [0xAF]
+        self.cpu.register_a.set(0x12)
+        self.cpu.tick()
+        self.assertEqual(self.cpu.total_clock_cycle_count, 4)
+        self.assertEqual(self.cpu.register_program_counter.get(), 1)
+        self.assertEqual(self.cpu.register_a.get(), 0)
+
+    def test_BIT_7_H_on_one(self):
+        self.memory.data = [0xCB, 0x7C]
+        self.cpu.register_h.set(0b10000000)
+        self.cpu.tick()
+        self.assertEqual(self.cpu.total_clock_cycle_count, 8)
+        self.assertEqual(self.cpu.register_program_counter.get(), 2)
+        self.assertFalse(self.cpu.flags.get_zero_flag())
+        self.assertFalse(self.cpu.flags.get_negative_flag())
+        self.assertTrue(self.cpu.flags.get_half_carry_flag())
+
+    def test_BIT_7_H_on_zero(self):
+        self.memory.data = [0xCB, 0x7C]
+        self.cpu.register_h.set(0)
+        self.cpu.tick()
+        self.assertEqual(self.cpu.total_clock_cycle_count, 8)
+        self.assertEqual(self.cpu.register_program_counter.get(), 2)
+        self.assertTrue(self.cpu.flags.get_zero_flag())
+        self.assertFalse(self.cpu.flags.get_negative_flag())
+        self.assertTrue(self.cpu.flags.get_half_carry_flag())
