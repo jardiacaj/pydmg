@@ -118,6 +118,11 @@ class FlagRegisterTestCase(unittest.TestCase):
         self.assertFalse(self.flags_register.get_carry_flag())
 
     def test_set_reset_zero(self):
+        self.flags_register.reset_zero_flag()
+        self.assertFalse(self.flags_register.get_zero_flag())
+        self.assertFalse(self.flags_register.get_negative_flag())
+        self.assertFalse(self.flags_register.get_half_carry_flag())
+        self.assertFalse(self.flags_register.get_carry_flag())
         self.flags_register.set_zero_flag()
         self.assertTrue(self.flags_register.get_zero_flag())
         self.assertFalse(self.flags_register.get_negative_flag())
@@ -130,6 +135,11 @@ class FlagRegisterTestCase(unittest.TestCase):
         self.assertFalse(self.flags_register.get_carry_flag())
 
     def test_set_reset_negative(self):
+        self.flags_register.reset_zero_flag()
+        self.assertFalse(self.flags_register.get_zero_flag())
+        self.assertFalse(self.flags_register.get_negative_flag())
+        self.assertFalse(self.flags_register.get_half_carry_flag())
+        self.assertFalse(self.flags_register.get_carry_flag())
         self.flags_register.set_negative_flag()
         self.assertFalse(self.flags_register.get_zero_flag())
         self.assertTrue(self.flags_register.get_negative_flag())
@@ -142,6 +152,11 @@ class FlagRegisterTestCase(unittest.TestCase):
         self.assertFalse(self.flags_register.get_carry_flag())
 
     def test_set_reset_half_carry(self):
+        self.flags_register.reset_zero_flag()
+        self.assertFalse(self.flags_register.get_zero_flag())
+        self.assertFalse(self.flags_register.get_negative_flag())
+        self.assertFalse(self.flags_register.get_half_carry_flag())
+        self.assertFalse(self.flags_register.get_carry_flag())
         self.flags_register.set_half_carry_flag()
         self.assertFalse(self.flags_register.get_zero_flag())
         self.assertFalse(self.flags_register.get_negative_flag())
@@ -154,6 +169,11 @@ class FlagRegisterTestCase(unittest.TestCase):
         self.assertFalse(self.flags_register.get_carry_flag())
 
     def test_set_reset_carry(self):
+        self.flags_register.reset_zero_flag()
+        self.assertFalse(self.flags_register.get_zero_flag())
+        self.assertFalse(self.flags_register.get_negative_flag())
+        self.assertFalse(self.flags_register.get_half_carry_flag())
+        self.assertFalse(self.flags_register.get_carry_flag())
         self.flags_register.set_carry_flag()
         self.assertFalse(self.flags_register.get_zero_flag())
         self.assertFalse(self.flags_register.get_negative_flag())
