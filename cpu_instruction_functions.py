@@ -25,6 +25,14 @@ def ld_c_a(cpu):
     )
 
 
+def ld_a_c(cpu):
+    cpu.register_a.set(
+        cpu.memory.read(
+            cpu.register_c.get() + 0xFF00
+        )
+    )
+
+
 def load_register_to_register(target_register_id, source_register_id):
     def instruction(cpu):
         target = get_register(target_register_id, cpu)
@@ -33,27 +41,58 @@ def load_register_to_register(target_register_id, source_register_id):
     return instruction
 
 
-def put_a_to_register_address(register_id):
+def put_register_to_register_address(target_pointer_id, source_register_id):
     def instruction(cpu):
-        register = get_register(register_id, cpu)
+        target_pointer = get_register(target_pointer_id, cpu)
+        source = get_register(source_register_id, cpu)
         cpu.memory.write(
-            register.get(),
-            cpu.register_a.get()
+            target_pointer.get(),
+            source.get()
         )
     return instruction
 
 
-def put_a_to_immediate_address(cpu, first_immediate, second_immediate):
-    cpu.memory.write(
-        first_immediate + (second_immediate << 8),
-        cpu.register_a.get()
-    )
+def load_register_address_to_register(target_register_id, source_register_id):
+    def instruction(cpu):
+        source_register = get_register(source_register_id, cpu)
+        target_register = get_register(target_register_id, cpu)
+        target_register.set(
+            cpu.memory.read(source_register.get())
+        )
+    return instruction
+
+
+def load_immediate_address_to_register(target_register_id):
+    def instruction(cpu, first_immediate, second_immediate):
+        target_register = get_register(target_register_id, cpu)
+        target_register.set(
+            cpu.memory.read(first_immediate + (second_immediate << 8))
+        )
+    return instruction
+
+
+def put_register_to_immediate_address(register_id):
+    def instruction(cpu, first_immediate, second_immediate):
+        register = get_register(register_id, cpu)
+        cpu.memory.write(
+            first_immediate + (second_immediate << 8),
+            register.get()
+        )
+    return instruction
 
 
 def ldh_n_a(cpu, immediate):
     cpu.memory.write(
         0xFF00 + immediate,
         cpu.register_a.get()
+    )
+
+
+def ldh_a_n(cpu, immediate):
+    cpu.register_a.set(
+        cpu.memory.read(
+            0xFF0 + immediate
+        )
     )
 
 
@@ -88,6 +127,25 @@ def load_16bit_immediate_to_register(register_id):
 def ldd_hl_a(cpu):
     cpu.memory.write(cpu.register_hl.get(), cpu.register_a.get())
     cpu.register_hl.add(-1)
+
+
+def ldi_hl_a(cpu):
+    cpu.memory.write(cpu.register_hl.get(), cpu.register_a.get())
+    cpu.register_hl.add(1)
+
+
+def ldd_a_hl(cpu):
+    cpu.register_a.set(
+        cpu.memory.read(cpu.register_hl.get())
+    )
+    cpu.register_hl.add(-1)
+
+
+def ldi_a_hl(cpu):
+    cpu.register_a.set(
+        cpu.memory.read(cpu.register_hl.get())
+    )
+    cpu.register_hl.add(1)
 
 
 def xor(register_id):

@@ -1,3 +1,5 @@
+import logging
+
 import cpu_instructions
 from register import Register16bit
 
@@ -42,6 +44,14 @@ class CPU:
         ]
         for i in range(self.bytes_before_immediates):
             immediates.pop(0)
+
+        logging.debug(
+            "PC: {:02X}: {}, immediates: {}".format(
+                self.register_program_counter.get(),
+                instruction_mnemonic,
+                immediates,
+            )
+        )
         instruction_implementation(self, *immediates)
         self.total_clock_cycle_count += instruction_clock_cycles
         self.register_program_counter.add(instruction_length_in_bytes)
