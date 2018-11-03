@@ -29,7 +29,7 @@ class FlagRegister(Register8bit):
     def set_all(self,
                       zero=False, negative=False,
                       half_carry=False, carry=False):
-        self.combined_register.data = (
+        self.set(
             (1 << 7 if zero else 0) +
             (1 << 6 if negative else 0) +
             (1 << 5 if half_carry else 0) +

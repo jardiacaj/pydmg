@@ -11,12 +11,11 @@ def nop(cpu):
     pass
 
 
-def ld_c_d8(cpu, immediate):
-    cpu.register_c.set(immediate)
-
-
-def ld_a_d8(cpu, immediate):
-    cpu.register_a.set(immediate)
+def load_8bit_immediate_to_register(register_id):
+    def instruction(cpu, immediate):
+        register = get_register(register_id, cpu)
+        register.set(immediate)
+    return instruction
 
 
 def ld_c_a(cpu):
@@ -26,14 +25,15 @@ def ld_c_a(cpu):
     )
 
 
-def ld_n_a(register_id):
+def load_register_to_register(target_register_id, source_register_id):
     def instruction(cpu):
-        register = get_register(register_id, cpu)
-        register.set(cpu.register_a.get())
+        target = get_register(target_register_id, cpu)
+        source = get_register(source_register_id, cpu)
+        target.set(source.get())
     return instruction
 
 
-def ld_addr_a(register_id):
+def put_a_to_register_address(register_id):
     def instruction(cpu):
         register = get_register(register_id, cpu)
         cpu.memory.write(
@@ -43,7 +43,7 @@ def ld_addr_a(register_id):
     return instruction
 
 
-def ld_imm_add_a(cpu, first_immediate, second_immediate):
+def put_a_to_immediate_address(cpu, first_immediate, second_immediate):
     cpu.memory.write(
         first_immediate + (second_immediate << 8),
         cpu.register_a.get()
@@ -57,7 +57,7 @@ def ldh_n_a(cpu, immediate):
     )
 
 
-def inc(register_id):
+def increment_register(register_id):
     def instruction(cpu):
         register = get_register(register_id, cpu)
         register.add(1)
@@ -67,7 +67,7 @@ def inc(register_id):
     return instruction
 
 
-def jr_nz(cpu, immediate):
+def relative_jump_if_not_zero(cpu, immediate):
     if cpu.flags.get_zero_flag():
         cpu.register_program_counter.add(twos_complement(immediate, 8))
 
@@ -77,9 +77,12 @@ def ld_sp_d16(cpu, first_immediate, second_immediate):
     cpu.register_stack_pointer.lower_eight_bit_register.set(first_immediate)
 
 
-def ld_hl_d16(cpu, first_immediate, second_immediate):
-    cpu.register_h.set(second_immediate)
-    cpu.register_l.set(first_immediate)
+def load_16bit_immediate_to_register(register_id):
+    def instruction(cpu, first_immediate, second_immediate):
+        register = get_register(register_id, cpu)
+        register.higher_eight_bit_register.set(second_immediate)
+        register.lower_eight_bit_register.set(first_immediate)
+    return instruction
 
 
 def ldd_hl_a(cpu):
@@ -87,9 +90,33 @@ def ldd_hl_a(cpu):
     cpu.register_hl.add(-1)
 
 
-def xor_a(cpu):
-    cpu.register_a.set(0)
-    cpu.flags.set_all(zero=True)
+def xor(register_id):
+    def instruction(cpu):
+        register = get_register(register_id, cpu)
+        cpu.register_a.set(
+            cpu.register_a.get() ^ register.get()
+        )
+        cpu.flags.set_all(
+            zero=(cpu.register_a.get() == 0),
+            negative=False,
+            half_carry=False,
+            carry=False,
+        )
+    return instruction
+
+
+def and_instruction(register_id):
+    def instruction(cpu):
+        register = get_register(register_id, cpu)
+        result = cpu.register_a.get() & register.get()
+        cpu.register_a.set(result)
+        cpu.flags.set_all(
+            zero=(cpu.register_a.get() == 0),
+            negative=False,
+            half_carry=True,
+            carry=False,
+        )
+    return instruction
 
 
 def h_register_bit_test(bit):

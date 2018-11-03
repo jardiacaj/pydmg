@@ -142,6 +142,19 @@ class SimpleCPUInstructionTestCase(unittest.TestCase):
         self.assertEqual(self.cpu.register_program_counter.get(), 1)
         self.assertEqual(self.cpu.register_a.get(), 0)
 
+    def test_AND_B(self):
+        self.memory.data = [0xA0]
+        self.cpu.register_a.set(0b10100)
+        self.cpu.register_b.set(0b11001)
+        self.cpu.tick()
+        self.assertEqual(self.cpu.total_clock_cycle_count, 4)
+        self.assertEqual(self.cpu.register_program_counter.get(), 1)
+        self.assertEqual(self.cpu.register_a.get(), 0b10000)
+        self.assertFalse(self.cpu.flags.get_zero_flag())
+        self.assertFalse(self.cpu.flags.get_negative_flag())
+        self.assertTrue(self.cpu.flags.get_half_carry_flag())
+        self.assertFalse(self.cpu.flags.get_carry_flag())
+
     def test_BIT_7_H_on_one(self):
         self.memory.data = [0xCB, 0x7C]
         self.cpu.register_h.set(0b10000000)

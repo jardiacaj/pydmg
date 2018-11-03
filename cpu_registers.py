@@ -9,6 +9,7 @@ L = 'L'
 BC = 'BC'
 DE = 'DE'
 HL = 'HL'
+SP = 'SP'
 
 
 class InvalidRegisterIndex(Exception):
@@ -38,6 +39,8 @@ def get_register(index, cpu):
         return cpu.register_de
     elif index == HL:
         return cpu.register_hl
+    elif index == SP:
+        return cpu.register_stack_pointer
     else:
         raise InvalidRegisterIndex(
             "Invalid register index: {}".format(index)
