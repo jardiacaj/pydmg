@@ -135,6 +135,18 @@ instructions = {
            "JR NZ,d8", 2, 8, None,
            cpu_instruction_implementation.relative_jump_if_not_zero),
 
+    0x28: ("Relative jump if zero",
+           "JR Z,d8", 2, 8, None,
+           cpu_instruction_implementation.relative_jump_if_zero),
+
+    0x30: ("Relative jump if not carry",
+           "JR NC,d8", 2, 8, None,
+           cpu_instruction_implementation.relative_jump_if_not_carry),
+
+    0x38: ("Relative jump if carry",
+           "JR C,d8", 2, 8, None,
+           cpu_instruction_implementation.relative_jump_if_carry),
+
     0x01: load_16bit_immediate_to_register(cpu_registers.BC),
     0x11: load_16bit_immediate_to_register(cpu_registers.DE),
     0x21: load_16bit_immediate_to_register(cpu_registers.HL),
