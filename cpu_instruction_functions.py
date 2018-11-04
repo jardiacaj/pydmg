@@ -33,6 +33,14 @@ def push(register_id):
     return instruction
 
 
+def pop(register_id):
+    def instruction(cpu):
+        register = get_register(register_id, cpu)
+        register.higher_eight_bit_register.set(cpu.stack_pop())
+        register.lower_eight_bit_register.set(cpu.stack_pop())
+    return instruction
+
+
 def load_8bit_immediate_to_register(register_id):
     def instruction(cpu, immediate):
         register = get_register(register_id, cpu)

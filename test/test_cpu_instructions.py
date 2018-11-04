@@ -32,6 +32,16 @@ class SimpleCPUInstructionTestCase(unittest.TestCase):
         self.assertEqual(self.cpu.stack_pop(), 0x12)
         self.assertEqual(self.cpu.stack_pop(), 0x00)
 
+    def test_POP(self):
+        self.memory.data = [0xC1] + [0]*2**16
+        self.cpu.register_stack_pointer.set(0xFFFE)
+        self.cpu.stack_push(0x12)
+        self.cpu.stack_push(0x34)
+        self.cpu.tick()
+        self.assertEqual(self.cpu.total_clock_cycle_count, 12)
+        self.assertEqual(self.cpu.register_program_counter.get(), 0x01)
+        self.assertEqual(self.cpu.register_bc.get(), 0x3412)
+
     def test_INC_C(self):
         self.memory.data = [0x0C]
         self.cpu.tick()

@@ -119,6 +119,15 @@ def push(register):
     )
 
 
+def pop(register):
+    return (
+        "Pop to register pair {} from stack and increment SP twice".format(
+            register),
+        "POP {}".format(register), 1, 12, None,
+        cpu_instruction_functions.pop(register)
+    )
+
+
 instructions = {
 
     0x00: ("No operation", "NOP", 1, 4, None, cpu_instruction_functions.nop),
@@ -264,6 +273,11 @@ instructions = {
     0xC5: push(cpu_registers.BC),
     0xD5: push(cpu_registers.DE),
     0xE5: push(cpu_registers.HL),
+
+    0xF1: pop(cpu_registers.AF),
+    0xC1: pop(cpu_registers.BC),
+    0xD1: pop(cpu_registers.DE),
+    0xE1: pop(cpu_registers.HL),
 
 }
 
