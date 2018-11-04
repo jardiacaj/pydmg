@@ -208,15 +208,3 @@ def and_instruction(register_id):
             carry=False,
         )
     return instruction
-
-
-def h_register_bit_test(bit):
-    def instruction(cpu):
-        h = cpu.register_h.get()
-        if h & (1 << bit):
-            cpu.flags.reset_zero_flag()
-        else:
-            cpu.flags.set_zero_flag()
-        cpu.flags.reset_negative_flag()
-        cpu.flags.set_half_carry_flag()
-    return instruction

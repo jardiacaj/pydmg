@@ -280,11 +280,3 @@ instructions = {
     0xE1: pop(cpu_registers.HL),
 
 }
-
-cb_instructions = {
-
-    0x7C: ("Test bit 7 of H",
-           "BIT 7,H", 2, 8, 'Z01-',
-           cpu_instruction_functions.h_register_bit_test(bit=7)),
-
-}

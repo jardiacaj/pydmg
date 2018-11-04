@@ -216,23 +216,3 @@ class SimpleCPUInstructionTestCase(unittest.TestCase):
         self.assertFalse(self.cpu.flags.get_negative_flag())
         self.assertTrue(self.cpu.flags.get_half_carry_flag())
         self.assertFalse(self.cpu.flags.get_carry_flag())
-
-    def test_BIT_7_H_on_one(self):
-        self.memory.data = [0xCB, 0x7C]
-        self.cpu.register_h.set(0b10000000)
-        self.cpu.tick()
-        self.assertEqual(self.cpu.total_clock_cycle_count, 8)
-        self.assertEqual(self.cpu.register_program_counter.get(), 2)
-        self.assertFalse(self.cpu.flags.get_zero_flag())
-        self.assertFalse(self.cpu.flags.get_negative_flag())
-        self.assertTrue(self.cpu.flags.get_half_carry_flag())
-
-    def test_BIT_7_H_on_zero(self):
-        self.memory.data = [0xCB, 0x7C]
-        self.cpu.register_h.set(0)
-        self.cpu.tick()
-        self.assertEqual(self.cpu.total_clock_cycle_count, 8)
-        self.assertEqual(self.cpu.register_program_counter.get(), 2)
-        self.assertTrue(self.cpu.flags.get_zero_flag())
-        self.assertFalse(self.cpu.flags.get_negative_flag())
-        self.assertTrue(self.cpu.flags.get_half_carry_flag())

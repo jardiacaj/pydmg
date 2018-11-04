@@ -1,6 +1,7 @@
 import logging
 
 import cpu_instructions
+import cpu_instructions_cb
 from register import Register16bit
 
 
@@ -41,6 +42,31 @@ class CPU:
         self.register_stack_pointer.add(1)
         return self.memory.read(self.register_stack_pointer.get())
 
+    def load_next_instruction(self):
+        pc = self.register_program_counter.get()
+        next_byte = self.memory.read(pc)
+        if next_byte == 0xCB:
+            self.cb_prefix = True
+            instruction_opcode = self.memory.read(pc + 1)
+            self.instruction_descriptor = cpu_instructions_cb.cb_instructions.get(
+                instruction_opcode)
+            self.bytes_before_immediates = 2
+        else:
+            self.cb_prefix = False
+            instruction_opcode = next_byte
+            self.instruction_descriptor = cpu_instructions.instructions.get(
+                instruction_opcode)
+            self.bytes_before_immediates = 1
+        if self.instruction_descriptor is None:
+            raise NotImplementedError(
+                'Instruction 0x{instruction_opcode:02X} '
+                '({instruction_opcode}) '
+                'not implemented (CB: {cb_prefix})'.format(
+                    instruction_opcode=instruction_opcode,
+                    cb_prefix=self.cb_prefix,
+                )
+            )
+
     def execute_loaded_instruction(self):
         instruction_name, instruction_mnemonic, \
             instruction_length_in_bytes, instruction_clock_cycles, \
@@ -64,31 +90,6 @@ class CPU:
             )
         )
         instruction_implementation(self, *immediates)
-
-    def load_next_instruction(self):
-        pc = self.register_program_counter.get()
-        next_byte = self.memory.read(pc)
-        if next_byte == 0xCB:
-            self.cb_prefix = True
-            instruction_opcode = self.memory.read(pc + 1)
-            self.instruction_descriptor = cpu_instructions.cb_instructions.get(
-                instruction_opcode)
-            self.bytes_before_immediates = 2
-        else:
-            self.cb_prefix = False
-            instruction_opcode = next_byte
-            self.instruction_descriptor = cpu_instructions.instructions.get(
-                instruction_opcode)
-            self.bytes_before_immediates = 1
-        if self.instruction_descriptor is None:
-            raise NotImplementedError(
-                'Instruction 0x{instruction_opcode:02X} '
-                '({instruction_opcode}) '
-                'not implemented (CB: {cb_prefix})'.format(
-                    instruction_opcode=instruction_opcode,
-                    cb_prefix=self.cb_prefix,
-                )
-            )
 
     def dump(self):
         return """ # CPU Dump #
