@@ -5,20 +5,75 @@ import cpu_registers
 def test_register_bit(register_id, bit):
     return (
         "Test bit {} of {}".format(bit, register_id),
-       "BIT {},{}".format(bit, register_id), 2, 8, 'Z01-',
-       cpu_instruction_functions_cb.register_bit_test(cpu_registers.H, bit=7)
+        "BIT {},{}".format(bit, register_id), 2, 8, 'Z01-',
+        cpu_instruction_functions_cb.register_bit_test(cpu_registers.H, bit=7)
     )
 
 
 def test_pointer_bit(register_id, bit):
     return (
         "Test bit {} of ({})".format(bit, register_id),
-       "BIT {},({})".format(bit, register_id), 2, 16, 'Z01-',
-       cpu_instruction_functions_cb.pointer_bit_test(register_id, bit)
+        "BIT {},({})".format(bit, register_id), 2, 16, 'Z01-',
+        cpu_instruction_functions_cb.pointer_bit_test(register_id, bit)
+    )
+
+
+def rotate_register_left_through_carry(register_id):
+    return (
+        "Rotate {} left through carry".format(register_id),
+        "RL {}".format(register_id), 2, 8, 'Z00C',
+        cpu_instruction_functions_cb.rotate_8bit_register_left(
+            register_id, through_carry=True)
+    )
+
+
+def rotate_pointer_left_through_carry(register_id):
+    return (
+        "Rotate pointer {} left through carry".format(register_id),
+        "RL ({})".format(register_id), 2, 16, 'Z00C',
+        cpu_instruction_functions_cb.rotate_pointer_left(
+            register_id, through_carry=True)
+    )
+
+
+def rotate_register_left(register_id):
+    return (
+        "Rotate {} left".format(register_id),
+        "RLC {}".format(register_id), 2, 8, 'Z00C',
+        cpu_instruction_functions_cb.rotate_8bit_register_left(
+            register_id, through_carry=False)
+    )
+
+
+def rotate_pointer_left(register_id):
+    return (
+        "Rotate pointer {} left".format(register_id),
+        "RLC ({})".format(register_id), 2, 16, 'Z00C',
+        cpu_instruction_functions_cb.rotate_pointer_left(
+            register_id, through_carry=False)
     )
 
 
 cb_instructions = {
+
+    0x00: rotate_register_left(cpu_registers.B),
+    0x01: rotate_register_left(cpu_registers.C),
+    0x02: rotate_register_left(cpu_registers.D),
+    0x03: rotate_register_left(cpu_registers.E),
+    0x04: rotate_register_left(cpu_registers.H),
+    0x05: rotate_register_left(cpu_registers.L),
+    0x06: rotate_pointer_left(cpu_registers.HL),
+    0x07: rotate_register_left(cpu_registers.A),
+
+    0x10: rotate_register_left_through_carry(cpu_registers.B),
+    0x11: rotate_register_left_through_carry(cpu_registers.C),
+    0x12: rotate_register_left_through_carry(cpu_registers.D),
+    0x13: rotate_register_left_through_carry(cpu_registers.E),
+    0x14: rotate_register_left_through_carry(cpu_registers.H),
+    0x15: rotate_register_left_through_carry(cpu_registers.L),
+    0x16: rotate_pointer_left_through_carry(cpu_registers.HL),
+    0x17: rotate_register_left_through_carry(cpu_registers.A),
+
     0x40: test_register_bit(cpu_registers.B, 0),
     0x41: test_register_bit(cpu_registers.C, 0),
     0x42: test_register_bit(cpu_registers.D, 0),
