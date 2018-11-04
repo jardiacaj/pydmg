@@ -129,7 +129,7 @@ def ldh_a_n(cpu, immediate):
     )
 
 
-def increment_register(register_id):
+def increment_8bit_register(register_id):
     def instruction(cpu):
         register = get_register(register_id, cpu)
         register.add(1)
@@ -140,7 +140,7 @@ def increment_register(register_id):
     return instruction
 
 
-def decrement_register(register_id):
+def decrement_8bit_register(register_id):
     def instruction(cpu):
         register = get_register(register_id, cpu)
         register.add(-1)
@@ -148,6 +148,20 @@ def decrement_register(register_id):
         cpu.flags.write_half_carry_flag(not borrowed_bit_4)
         cpu.flags.write_zero_flag(register.get() == 0x00)
         cpu.flags.set_negative_flag()
+    return instruction
+
+
+def increment_16bit_register(register_id):
+    def instruction(cpu):
+        register = get_register(register_id, cpu)
+        register.add(1)
+    return instruction
+
+
+def decrement_16bit_register(register_id):
+    def instruction(cpu):
+        register = get_register(register_id, cpu)
+        register.add(-1)
     return instruction
 
 

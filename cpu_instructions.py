@@ -71,19 +71,35 @@ def put_register_to_immediate_pointer(register):
     )
 
 
-def increment(register):
+def increment_8bit(register):
     return (
         "Increment {}".format(register),
         "INC {}".format(register), 1, 4, 'Z0H-',
-        cpu_instruction_functions.increment_register(register)
+        cpu_instruction_functions.increment_8bit_register(register)
     )
 
 
-def decrement(register):
+def decrement_8bit(register):
     return (
         "Decrement {}".format(register),
         "DEC {}".format(register), 1, 4, 'Z1H-',
-        cpu_instruction_functions.decrement_register(register)
+        cpu_instruction_functions.decrement_8bit_register(register)
+    )
+
+
+def increment_16bit(register):
+    return (
+        "Increment {}".format(register),
+        "INC {}".format(register), 1, 8, None,
+        cpu_instruction_functions.increment_16bit_register(register)
+    )
+
+
+def decrement_16bit(register):
+    return (
+        "Decrement {}".format(register),
+        "DEC {}".format(register), 1, 8, None,
+        cpu_instruction_functions.decrement_16bit_register(register)
     )
 
 
@@ -162,21 +178,31 @@ instructions = {
             cpu_registers.A, through_carry=True)
     ),
 
-    0x3C: increment(cpu_registers.A),
-    0x04: increment(cpu_registers.B),
-    0x0C: increment(cpu_registers.C),
-    0x14: increment(cpu_registers.D),
-    0x1C: increment(cpu_registers.E),
-    0x24: increment(cpu_registers.H),
-    0x2C: increment(cpu_registers.L),
+    0x3C: increment_8bit(cpu_registers.A),
+    0x04: increment_8bit(cpu_registers.B),
+    0x0C: increment_8bit(cpu_registers.C),
+    0x14: increment_8bit(cpu_registers.D),
+    0x1C: increment_8bit(cpu_registers.E),
+    0x24: increment_8bit(cpu_registers.H),
+    0x2C: increment_8bit(cpu_registers.L),
 
-    0x3D: decrement(cpu_registers.A),
-    0x05: decrement(cpu_registers.B),
-    0x0D: decrement(cpu_registers.C),
-    0x15: decrement(cpu_registers.D),
-    0x1D: decrement(cpu_registers.E),
-    0x25: decrement(cpu_registers.H),
-    0x2D: decrement(cpu_registers.L),
+    0x03: increment_16bit(cpu_registers.BC),
+    0x13: increment_16bit(cpu_registers.DE),
+    0x23: increment_16bit(cpu_registers.HL),
+    0x33: increment_16bit(cpu_registers.SP),
+
+    0x3D: decrement_8bit(cpu_registers.A),
+    0x05: decrement_8bit(cpu_registers.B),
+    0x0D: decrement_8bit(cpu_registers.C),
+    0x15: decrement_8bit(cpu_registers.D),
+    0x1D: decrement_8bit(cpu_registers.E),
+    0x25: decrement_8bit(cpu_registers.H),
+    0x2D: decrement_8bit(cpu_registers.L),
+
+    0x0B: decrement_16bit(cpu_registers.BC),
+    0x1B: decrement_16bit(cpu_registers.DE),
+    0x2B: decrement_16bit(cpu_registers.HL),
+    0x3B: decrement_16bit(cpu_registers.SP),
 
     0x7F: load_8bit_register_to_register(cpu_registers.A, cpu_registers.A),
     0x78: load_8bit_register_to_register(cpu_registers.A, cpu_registers.B),

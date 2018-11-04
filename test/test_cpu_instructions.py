@@ -95,6 +95,30 @@ class SimpleCPUInstructionTestCase(unittest.TestCase):
         self.assertTrue(self.cpu.flags.get_negative_flag())
         self.assertTrue(self.cpu.flags.get_half_carry_flag())
 
+    def test_INC_BC(self):
+        self.memory.data = [0x03, 0x03]
+        self.cpu.register_bc.set(0xFFFF)
+        self.cpu.tick()
+        self.assertEqual(self.cpu.total_clock_cycle_count, 8)
+        self.assertEqual(self.cpu.register_program_counter.get(), 1)
+        self.assertEqual(self.cpu.register_bc.get(), 0x0000)
+        self.cpu.tick()
+        self.assertEqual(self.cpu.total_clock_cycle_count, 16)
+        self.assertEqual(self.cpu.register_program_counter.get(), 2)
+        self.assertEqual(self.cpu.register_bc.get(), 0x0001)
+
+    def test_DEC_BC(self):
+        self.memory.data = [0x0B, 0x0B]
+        self.cpu.register_bc.set(0x0001)
+        self.cpu.tick()
+        self.assertEqual(self.cpu.total_clock_cycle_count, 8)
+        self.assertEqual(self.cpu.register_program_counter.get(), 1)
+        self.assertEqual(self.cpu.register_bc.get(), 0x0000)
+        self.cpu.tick()
+        self.assertEqual(self.cpu.total_clock_cycle_count, 16)
+        self.assertEqual(self.cpu.register_program_counter.get(), 2)
+        self.assertEqual(self.cpu.register_bc.get(), 0xFFFF)
+
     def test_LD_C_A(self):
         self.memory.data = [0x4F]
         self.cpu.register_a.set(0x12)
