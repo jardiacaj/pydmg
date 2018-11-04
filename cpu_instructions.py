@@ -11,6 +11,7 @@ The descriptors are tuples formed like this:
  * Function
 """
 import cpu_instruction_functions
+import cpu_instruction_functions_cb
 import cpu_registers
 
 
@@ -131,6 +132,27 @@ def pop(register):
 instructions = {
 
     0x00: ("No operation", "NOP", 1, 4, None, cpu_instruction_functions.nop),
+
+    0x07: (
+        "Rotate A left", "RLCA", 1, 4, 'Z00C',
+        cpu_instruction_functions_cb.rotate_8bit_register_left(
+            cpu_registers.A, through_carry=False)
+    ),
+    0x17: (
+        "Rotate A left through carry", "RLA", 1, 4, 'Z00C',
+        cpu_instruction_functions_cb.rotate_8bit_register_left(
+            cpu_registers.A, through_carry=True)
+    ),
+    0x0F: (
+        "Rotate A right", "RRCA", 1, 4, 'Z00C',
+        cpu_instruction_functions_cb.rotate_8bit_register_right(
+            cpu_registers.A, through_carry=False)
+    ),
+    0x1F: (
+        "Rotate A right through carry", "RRA", 1, 4, 'Z00C',
+        cpu_instruction_functions_cb.rotate_8bit_register_right(
+            cpu_registers.A, through_carry=True)
+    ),
 
     0x3C: increment(cpu_registers.A),
     0x04: increment(cpu_registers.B),

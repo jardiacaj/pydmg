@@ -54,6 +54,42 @@ def rotate_pointer_left(register_id):
     )
 
 
+def rotate_register_right(register_id):
+    return (
+        "Rotate {} right".format(register_id),
+        "RRC {}".format(register_id), 2, 8, 'Z00C',
+        cpu_instruction_functions_cb.rotate_8bit_register_right(
+            register_id, through_carry=False)
+    )
+
+
+def rotate_pointer_right(register_id):
+    return (
+        "Rotate pointer {} right".format(register_id),
+        "RRC ({})".format(register_id), 2, 16, 'Z00C',
+        cpu_instruction_functions_cb.rotate_pointer_right(
+            register_id, through_carry=False)
+    )
+
+
+def rotate_register_right_through_carry(register_id):
+    return (
+        "Rotate {} right through carry".format(register_id),
+        "RR {}".format(register_id), 2, 8, 'Z00C',
+        cpu_instruction_functions_cb.rotate_8bit_register_right(
+            register_id, through_carry=True)
+    )
+
+
+def rotate_pointer_right_through_carry(register_id):
+    return (
+        "Rotate pointer {} right through carry".format(register_id),
+        "RR ({})".format(register_id), 2, 16, 'Z00C',
+        cpu_instruction_functions_cb.rotate_pointer_right(
+            register_id, through_carry=True)
+    )
+
+
 cb_instructions = {
 
     0x00: rotate_register_left(cpu_registers.B),
@@ -65,6 +101,15 @@ cb_instructions = {
     0x06: rotate_pointer_left(cpu_registers.HL),
     0x07: rotate_register_left(cpu_registers.A),
 
+    0x08: rotate_register_right(cpu_registers.B),
+    0x09: rotate_register_right(cpu_registers.C),
+    0x0A: rotate_register_right(cpu_registers.D),
+    0x0B: rotate_register_right(cpu_registers.E),
+    0x0C: rotate_register_right(cpu_registers.H),
+    0x0D: rotate_register_right(cpu_registers.L),
+    0x0E: rotate_pointer_right(cpu_registers.HL),
+    0x0F: rotate_register_right(cpu_registers.A),
+
     0x10: rotate_register_left_through_carry(cpu_registers.B),
     0x11: rotate_register_left_through_carry(cpu_registers.C),
     0x12: rotate_register_left_through_carry(cpu_registers.D),
@@ -73,6 +118,15 @@ cb_instructions = {
     0x15: rotate_register_left_through_carry(cpu_registers.L),
     0x16: rotate_pointer_left_through_carry(cpu_registers.HL),
     0x17: rotate_register_left_through_carry(cpu_registers.A),
+
+    0x18: rotate_register_right_through_carry(cpu_registers.B),
+    0x19: rotate_register_right_through_carry(cpu_registers.C),
+    0x1A: rotate_register_right_through_carry(cpu_registers.D),
+    0x1B: rotate_register_right_through_carry(cpu_registers.E),
+    0x1C: rotate_register_right_through_carry(cpu_registers.H),
+    0x1D: rotate_register_right_through_carry(cpu_registers.L),
+    0x1E: rotate_pointer_right_through_carry(cpu_registers.HL),
+    0x1F: rotate_register_right_through_carry(cpu_registers.A),
 
     0x40: test_register_bit(cpu_registers.B, 0),
     0x41: test_register_bit(cpu_registers.C, 0),
