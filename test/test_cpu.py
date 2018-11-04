@@ -7,7 +7,6 @@ from ram import RAM
 class DefaultCPUTestCase(unittest.TestCase):
     def setUp(self):
         self.memory = RAM()
-        self.memory.data = [0]
         self.cpu = CPU(self.memory)
 
     def testDefaultCPU(self):

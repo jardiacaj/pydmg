@@ -1,8 +1,6 @@
 import logging
 
 import cpu_instruction_table
-import cpu_instruction_decoder
-import cpu_instruction_decoder_cb
 from register import Register16bit
 
 
@@ -74,23 +72,24 @@ class CPU:
             instruction_length_in_bytes, instruction_clock_cycles, \
             instruction_flags_changed, instruction_implementation = \
             self.instruction_descriptor
-        immediates = [
+        instruction_bytes = [
             self.memory.read(self.register_program_counter.get() + i)
             for i in range(instruction_length_in_bytes)
         ]
-        for i in range(self.bytes_before_immediates):
-            immediates.pop(0)
+        immediates = instruction_bytes[self.bytes_before_immediates:]
+
+        logging.debug(
+            "PC {:02X}: {:12} -- {}".format(
+                self.register_program_counter.get(),
+                " ".join(["{:02X}".format(byte) for byte in instruction_bytes]),
+                instruction_mnemonic,
+                " imm:  if instruction_bytes",
+            )
+        )
 
         self.total_clock_cycle_count += instruction_clock_cycles
         self.register_program_counter.add(instruction_length_in_bytes)
 
-        logging.debug(
-            "PC: {:02X}: {}, immediates: {}".format(
-                self.register_program_counter.get(),
-                instruction_mnemonic,
-                immediates,
-            )
-        )
         instruction_implementation(self, *immediates)
 
     def dump(self):
@@ -102,6 +101,9 @@ class CPU:
             HL 0x{hl:04X}
             SP 0x{sp:04X}
             PC 0x{pc:04X}
+
+            Stack
+{stack_dump}
             """.format(
                 cycles=self.total_clock_cycle_count,
                 af=self.register_af.get(),
@@ -114,4 +116,14 @@ class CPU:
                 hl=self.register_hl.get(),
                 sp=self.register_stack_pointer.get(),
                 pc=self.register_program_counter.get(),
+                stack_dump=self.stack_dump(),
             )
+
+    def stack_dump(self):
+        return "\n".join(
+            (
+                "            {:04X}".format(self.memory.read(address))
+                for address
+                in range(self.register_stack_pointer.get(), 0xFFFE)
+            )
+        )

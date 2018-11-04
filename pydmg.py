@@ -2,6 +2,7 @@ import argparse
 import logging
 
 from cpu import CPU
+from debugger import DMGDebugger
 from ram import RAM
 
 
@@ -12,9 +13,12 @@ class PyDMG:
         self.memory.load_main_rom(romfile_path)
         self.cpu = CPU(self.memory)
 
+    def step(self):
+        self.cpu.tick()
+
     def run(self):
         while True:
-            self.cpu.tick()
+            self.step()
 
 
 if __name__ == "__main__":
@@ -32,6 +36,7 @@ if __name__ == "__main__":
                             logging._levelToName[logging.ERROR],
                             logging._levelToName[logging.CRITICAL],
                         ))
+    parser.add_argument("--debugger", action='store_true')
     args = parser.parse_args()
 
     logging.basicConfig(level=logging._nameToLevel[args.log_level])
@@ -41,4 +46,8 @@ if __name__ == "__main__":
         romfile_path=args.romfile
     )
 
-    emulator.run()
+    if not args.debugger:
+        emulator.run()
+    else:
+        debugger = DMGDebugger(emulator)
+        debugger.run()
