@@ -1,7 +1,8 @@
 import logging
 
-import cpu_instructions
-import cpu_instructions_cb
+import cpu_instruction_table
+import cpu_instruction_decoder
+import cpu_instruction_decoder_cb
 from register import Register16bit
 
 
@@ -49,13 +50,13 @@ class CPU:
         if next_byte == 0xCB:
             self.cb_prefix = True
             instruction_opcode = self.memory.read(pc + 1)
-            self.instruction_descriptor = cpu_instructions_cb.cb_instructions.get(
+            self.instruction_descriptor = cpu_instruction_table.cb_instructions.get(
                 instruction_opcode)
             self.bytes_before_immediates = 2
         else:
             self.cb_prefix = False
             instruction_opcode = next_byte
-            self.instruction_descriptor = cpu_instructions.instructions.get(
+            self.instruction_descriptor = cpu_instruction_table.instructions.get(
                 instruction_opcode)
             self.bytes_before_immediates = 1
         if self.instruction_descriptor is None:

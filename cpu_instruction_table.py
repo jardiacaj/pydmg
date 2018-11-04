@@ -1,180 +1,41 @@
-"""
-Instructions (and cb_instructions) is a dict of command descriptors keyed by
-opcode
-
-The descriptors are tuples formed like this:
- * Name
- * Mnemonic
- * Length in bytes
- * Duration in clock cycles
- * Flags affected (Z N H C)
- * Function
-"""
-import cpu_instruction_functions
-import cpu_instruction_functions_cb
+import cpu_instruction_implementation
+import cpu_instruction_implementation_cb
 import cpu_registers
-
-
-def load_8bit_immediate_to_register(register):
-    return (
-        "Load 8-bit immediate to {}".format(register),
-        "LD {},d8".format(register), 2, 8, None,
-        cpu_instruction_functions.load_8bit_immediate_to_register(register)
-    )
-
-
-def load_16bit_immediate_to_register(register):
-    return (
-        "Load 16-bit immediate to {}".format(register),
-        "LD {},d16".format(register), 3, 12, None,
-        cpu_instruction_functions.load_16bit_immediate_to_register(register)
-     )
-
-
-def load_pointer_to_register(target_register, source_pointer):
-    return (
-        "Put value ({}) into {}".format(source_pointer, target_register),
-        "LD {}, ({})".format(target_register, source_pointer), 1, 8, None,
-        cpu_instruction_functions.load_register_address_to_register(
-            target_register,
-            source_pointer
-        )
-    )
-
-
-def load_immediate_pointer_to_register(target_register):
-    return (
-        "Put value (d16) into {}".format(target_register),
-        "LD {}, (d16)".format(target_register), 3, 16, None,
-        cpu_instruction_functions.load_immediate_address_to_register(
-            target_register
-        )
-    )
-
-
-def put_register_to_pointer(target_pointer, source):
-    return (
-        "Put value {} into address ({})".format(source, target_pointer),
-        "LD ({}),{}".format(target_pointer, source), 1, 8, None,
-        cpu_instruction_functions.put_register_to_register_address(
-            target_pointer,
-            source
-        )
-    )
-
-
-def put_register_to_immediate_pointer(register):
-    return(
-        "Put value {} into immediate address".format(register),
-        "LD (d16),{}".format(register), 3, 16, None,
-        cpu_instruction_functions.put_register_to_immediate_address(register)
-    )
-
-
-def increment_8bit(register):
-    return (
-        "Increment {}".format(register),
-        "INC {}".format(register), 1, 4, 'Z0H-',
-        cpu_instruction_functions.increment_8bit_register(register)
-    )
-
-
-def decrement_8bit(register):
-    return (
-        "Decrement {}".format(register),
-        "DEC {}".format(register), 1, 4, 'Z1H-',
-        cpu_instruction_functions.decrement_8bit_register(register)
-    )
-
-
-def increment_16bit(register):
-    return (
-        "Increment {}".format(register),
-        "INC {}".format(register), 1, 8, None,
-        cpu_instruction_functions.increment_16bit_register(register)
-    )
-
-
-def decrement_16bit(register):
-    return (
-        "Decrement {}".format(register),
-        "DEC {}".format(register), 1, 8, None,
-        cpu_instruction_functions.decrement_16bit_register(register)
-    )
-
-
-def load_8bit_register_to_register(target, source):
-    return (
-        "Put {} into {}".format(source, target),
-        "LD {},{}".format(target, source), 1, 4, None,
-        cpu_instruction_functions.load_register_to_register(target, source)
-    )
-
-
-def load_16bit_register_to_register(target, source):
-    return (
-        "Put {} into {}".format(source, target),
-        "LD {},{}".format(target, source), 1, 8, None,
-        cpu_instruction_functions.load_register_to_register(target, source)
-    )
-
-
-def xor(register):
-    return (
-        "XOR {} with A, store to A".format(register),
-        "XOR {}".format(register), 1, 4, 'Z000',
-        cpu_instruction_functions.xor(register)
-    )
-
-
-def and_instruction(register):
-    return (
-        "AND {} with A, store to A".format(register),
-        "AND {}".format(register), 1, 4, 'Z010',
-        cpu_instruction_functions.and_instruction(register)
-    )
-
-
-def push(register):
-    return (
-        "Push register pair {} to stack and decrement SP twice".format(
-            register),
-        "PUSH {}".format(register), 1, 16, None,
-        cpu_instruction_functions.push(register)
-    )
-
-
-def pop(register):
-    return (
-        "Pop to register pair {} from stack and increment SP twice".format(
-            register),
-        "POP {}".format(register), 1, 12, None,
-        cpu_instruction_functions.pop(register)
-    )
-
+from cpu_instruction_decoder import increment_8bit, increment_16bit, decrement_8bit, \
+    decrement_16bit, load_8bit_register_to_register, put_register_to_pointer, \
+    put_register_to_immediate_pointer, load_pointer_to_register, \
+    load_immediate_pointer_to_register, load_16bit_immediate_to_register, \
+    load_16bit_register_to_register, load_8bit_immediate_to_register, xor, \
+    and_instruction, compare_register, compare_pointer, compare_immediate, \
+    push, pop
+from cpu_instruction_decoder_cb import rotate_register_left, rotate_pointer_left, \
+    rotate_register_right, rotate_pointer_right, \
+    rotate_register_left_through_carry, rotate_pointer_left_through_carry, \
+    rotate_register_right_through_carry, rotate_pointer_right_through_carry, \
+    test_register_bit, test_pointer_bit
 
 instructions = {
 
-    0x00: ("No operation", "NOP", 1, 4, None, cpu_instruction_functions.nop),
+    0x00: ("No operation", "NOP", 1, 4, None, cpu_instruction_implementation.nop),
 
     0x07: (
         "Rotate A left", "RLCA", 1, 4, 'Z00C',
-        cpu_instruction_functions_cb.rotate_8bit_register_left(
+        cpu_instruction_implementation_cb.rotate_8bit_register_left(
             cpu_registers.A, through_carry=False)
     ),
     0x17: (
         "Rotate A left through carry", "RLA", 1, 4, 'Z00C',
-        cpu_instruction_functions_cb.rotate_8bit_register_left(
+        cpu_instruction_implementation_cb.rotate_8bit_register_left(
             cpu_registers.A, through_carry=True)
     ),
     0x0F: (
         "Rotate A right", "RRCA", 1, 4, 'Z00C',
-        cpu_instruction_functions_cb.rotate_8bit_register_right(
+        cpu_instruction_implementation_cb.rotate_8bit_register_right(
             cpu_registers.A, through_carry=False)
     ),
     0x1F: (
         "Rotate A right through carry", "RRA", 1, 4, 'Z00C',
-        cpu_instruction_functions_cb.rotate_8bit_register_right(
+        cpu_instruction_implementation_cb.rotate_8bit_register_right(
             cpu_registers.A, through_carry=True)
     ),
 
@@ -272,7 +133,7 @@ instructions = {
 
     0x20: ("Relative jump if not zero",
            "JR NZ,d8", 2, 8, None,
-           cpu_instruction_functions.relative_jump_if_not_zero),
+           cpu_instruction_implementation.relative_jump_if_not_zero),
 
     0x01: load_16bit_immediate_to_register(cpu_registers.BC),
     0x11: load_16bit_immediate_to_register(cpu_registers.DE),
@@ -282,16 +143,16 @@ instructions = {
     0xF9: load_16bit_register_to_register(cpu_registers.SP, cpu_registers.HL),
 
     0x32: ("Put A into memory address HL and decrement HL",
-           "LDD (HL),A", 1, 8, None, cpu_instruction_functions.ldd_hl_a),
+           "LDD (HL),A", 1, 8, None, cpu_instruction_implementation.ldd_hl_a),
 
     0x3A: ("Load value at address HL into A and decrement HL",
-           "LDD A,(HL)", 1, 8, None, cpu_instruction_functions.ldd_a_hl),
+           "LDD A,(HL)", 1, 8, None, cpu_instruction_implementation.ldd_a_hl),
 
     0x2A: ("Load value at address HL into A and increment HL",
-           "LDI A,(HL)", 1, 8, None, cpu_instruction_functions.ldi_a_hl),
+           "LDI A,(HL)", 1, 8, None, cpu_instruction_implementation.ldi_a_hl),
 
     0x22: ("Put A into memory address HL and increment HL",
-           "LDI (HL),A", 1, 8, None, cpu_instruction_functions.ldi_hl_a),
+           "LDI (HL),A", 1, 8, None, cpu_instruction_implementation.ldi_hl_a),
 
     0x3E: load_8bit_immediate_to_register(cpu_registers.A),
     0x06: load_8bit_immediate_to_register(cpu_registers.B),
@@ -317,24 +178,34 @@ instructions = {
     0xA4: and_instruction(cpu_registers.H),
     0xA5: and_instruction(cpu_registers.L),
 
+    0xBF: compare_register(cpu_registers.A),
+    0xB8: compare_register(cpu_registers.B),
+    0xB9: compare_register(cpu_registers.C),
+    0xBA: compare_register(cpu_registers.D),
+    0xBB: compare_register(cpu_registers.E),
+    0xBC: compare_register(cpu_registers.H),
+    0xBD: compare_register(cpu_registers.L),
+    0xBE: compare_pointer(cpu_registers.HL),
+    0xFE: compare_immediate(),
+
     0xE0: ("Put A into memory address $FF00+n",
-           "LDH (d8),A", 2, 12, None, cpu_instruction_functions.ldh_n_a),
+           "LDH (d8),A", 2, 12, None, cpu_instruction_implementation.ldh_n_a),
 
     0xE2: ("Put A into address $FF00 + register C",
-           "LD (C),A", 1, 8, None, cpu_instruction_functions.ld_c_a),
+           "LD (C),A", 1, 8, None, cpu_instruction_implementation.ld_c_a),
 
     0xF2: ("Load value at address ($FF00 + C) into A",
-           "LD A,(C)", 1, 8, None, cpu_instruction_functions.ld_a_c),
+           "LD A,(C)", 1, 8, None, cpu_instruction_implementation.ld_a_c),
 
     0xF0: ("Load value at address ($FF00 + immediate) into A",
-           "LD A,(d8)", 2, 12, None, cpu_instruction_functions.ldh_a_n),
+           "LD A,(d8)", 2, 12, None, cpu_instruction_implementation.ldh_a_n),
 
     0xC9: ("Pop address from stack and then jump to that address",
-           "RET", 1, 8, None, cpu_instruction_functions.ret),
+           "RET", 1, 8, None, cpu_instruction_implementation.ret),
 
     0xCD: ("Push address of next instruction onto stack and then jump to "
            "immediate address",
-           "CALL d16", 3, 12, None, cpu_instruction_functions.call),
+           "CALL d16", 3, 12, None, cpu_instruction_implementation.call),
 
     0xF5: push(cpu_registers.AF),
     0xC5: push(cpu_registers.BC),
@@ -345,5 +216,117 @@ instructions = {
     0xC1: pop(cpu_registers.BC),
     0xD1: pop(cpu_registers.DE),
     0xE1: pop(cpu_registers.HL),
+
+}
+
+cb_instructions = {
+
+    0x00: rotate_register_left(cpu_registers.B),
+    0x01: rotate_register_left(cpu_registers.C),
+    0x02: rotate_register_left(cpu_registers.D),
+    0x03: rotate_register_left(cpu_registers.E),
+    0x04: rotate_register_left(cpu_registers.H),
+    0x05: rotate_register_left(cpu_registers.L),
+    0x06: rotate_pointer_left(cpu_registers.HL),
+    0x07: rotate_register_left(cpu_registers.A),
+
+    0x08: rotate_register_right(cpu_registers.B),
+    0x09: rotate_register_right(cpu_registers.C),
+    0x0A: rotate_register_right(cpu_registers.D),
+    0x0B: rotate_register_right(cpu_registers.E),
+    0x0C: rotate_register_right(cpu_registers.H),
+    0x0D: rotate_register_right(cpu_registers.L),
+    0x0E: rotate_pointer_right(cpu_registers.HL),
+    0x0F: rotate_register_right(cpu_registers.A),
+
+    0x10: rotate_register_left_through_carry(cpu_registers.B),
+    0x11: rotate_register_left_through_carry(cpu_registers.C),
+    0x12: rotate_register_left_through_carry(cpu_registers.D),
+    0x13: rotate_register_left_through_carry(cpu_registers.E),
+    0x14: rotate_register_left_through_carry(cpu_registers.H),
+    0x15: rotate_register_left_through_carry(cpu_registers.L),
+    0x16: rotate_pointer_left_through_carry(cpu_registers.HL),
+    0x17: rotate_register_left_through_carry(cpu_registers.A),
+
+    0x18: rotate_register_right_through_carry(cpu_registers.B),
+    0x19: rotate_register_right_through_carry(cpu_registers.C),
+    0x1A: rotate_register_right_through_carry(cpu_registers.D),
+    0x1B: rotate_register_right_through_carry(cpu_registers.E),
+    0x1C: rotate_register_right_through_carry(cpu_registers.H),
+    0x1D: rotate_register_right_through_carry(cpu_registers.L),
+    0x1E: rotate_pointer_right_through_carry(cpu_registers.HL),
+    0x1F: rotate_register_right_through_carry(cpu_registers.A),
+
+    0x40: test_register_bit(cpu_registers.B, 0),
+    0x41: test_register_bit(cpu_registers.C, 0),
+    0x42: test_register_bit(cpu_registers.D, 0),
+    0x43: test_register_bit(cpu_registers.E, 0),
+    0x44: test_register_bit(cpu_registers.H, 0),
+    0x45: test_register_bit(cpu_registers.L, 0),
+    0x46: test_pointer_bit(cpu_registers.HL, 0),
+    0x47: test_register_bit(cpu_registers.A, 0),
+
+    0x48: test_register_bit(cpu_registers.B, 1),
+    0x49: test_register_bit(cpu_registers.C, 1),
+    0x4A: test_register_bit(cpu_registers.D, 1),
+    0x4B: test_register_bit(cpu_registers.E, 1),
+    0x4C: test_register_bit(cpu_registers.H, 1),
+    0x4D: test_register_bit(cpu_registers.L, 1),
+    0x4E: test_pointer_bit(cpu_registers.HL, 1),
+    0x4F: test_register_bit(cpu_registers.A, 1),
+
+    0x50: test_register_bit(cpu_registers.B, 2),
+    0x51: test_register_bit(cpu_registers.C, 2),
+    0x52: test_register_bit(cpu_registers.D, 2),
+    0x53: test_register_bit(cpu_registers.E, 2),
+    0x54: test_register_bit(cpu_registers.H, 2),
+    0x55: test_register_bit(cpu_registers.L, 2),
+    0x56: test_pointer_bit(cpu_registers.HL, 2),
+    0x57: test_register_bit(cpu_registers.A, 2),
+
+    0x58: test_register_bit(cpu_registers.B, 3),
+    0x59: test_register_bit(cpu_registers.C, 3),
+    0x5A: test_register_bit(cpu_registers.D, 3),
+    0x5B: test_register_bit(cpu_registers.E, 3),
+    0x5C: test_register_bit(cpu_registers.H, 3),
+    0x5D: test_register_bit(cpu_registers.L, 3),
+    0x5E: test_pointer_bit(cpu_registers.HL, 3),
+    0x5F: test_register_bit(cpu_registers.A, 3),
+
+    0x60: test_register_bit(cpu_registers.B, 4),
+    0x61: test_register_bit(cpu_registers.C, 4),
+    0x62: test_register_bit(cpu_registers.D, 4),
+    0x63: test_register_bit(cpu_registers.E, 4),
+    0x64: test_register_bit(cpu_registers.H, 4),
+    0x65: test_register_bit(cpu_registers.L, 4),
+    0x66: test_pointer_bit(cpu_registers.HL, 4),
+    0x67: test_register_bit(cpu_registers.A, 4),
+
+    0x68: test_register_bit(cpu_registers.B, 5),
+    0x69: test_register_bit(cpu_registers.C, 5),
+    0x6A: test_register_bit(cpu_registers.D, 5),
+    0x6B: test_register_bit(cpu_registers.E, 5),
+    0x6C: test_register_bit(cpu_registers.H, 5),
+    0x6D: test_register_bit(cpu_registers.L, 5),
+    0x6E: test_pointer_bit(cpu_registers.HL, 5),
+    0x6F: test_register_bit(cpu_registers.A, 5),
+
+    0x70: test_register_bit(cpu_registers.B, 6),
+    0x71: test_register_bit(cpu_registers.C, 6),
+    0x72: test_register_bit(cpu_registers.D, 6),
+    0x73: test_register_bit(cpu_registers.E, 6),
+    0x74: test_register_bit(cpu_registers.H, 6),
+    0x75: test_register_bit(cpu_registers.L, 6),
+    0x76: test_pointer_bit(cpu_registers.HL, 6),
+    0x77: test_register_bit(cpu_registers.A, 6),
+
+    0x78: test_register_bit(cpu_registers.B, 7),
+    0x79: test_register_bit(cpu_registers.C, 7),
+    0x7A: test_register_bit(cpu_registers.D, 7),
+    0x7B: test_register_bit(cpu_registers.E, 7),
+    0x7C: test_register_bit(cpu_registers.H, 7),
+    0x7D: test_register_bit(cpu_registers.L, 7),
+    0x7E: test_pointer_bit(cpu_registers.HL, 7),
+    0x7F: test_register_bit(cpu_registers.A, 7),
 
 }

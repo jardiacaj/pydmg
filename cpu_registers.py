@@ -21,7 +21,7 @@ def get_register(index, cpu):
     if index == A:
         return cpu.register_a
     elif index == F:
-        return cpu.register_f
+        return cpu.flags
     elif index == B:
         return cpu.register_b
     elif index == C:

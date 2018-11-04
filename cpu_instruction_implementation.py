@@ -239,3 +239,43 @@ def and_instruction(register_id):
             carry=False,
         )
     return instruction
+
+
+def compare_register_to_a(register_id):
+    def instruction(cpu):
+        register = get_register(register_id, cpu)
+        borrowed_bit_4 = (cpu.register_a.get()) % 16 > (register.get() % 16)
+        result = cpu.register_a.get() - register.get()
+        cpu.flags.set_all(
+            zero=result == 0,
+            negative=True,
+            half_carry=borrowed_bit_4,
+            carry=result < 0,
+        )
+    return instruction
+
+
+def compare_pointer_to_a(register_id):
+    def instruction(cpu):
+        register = get_register(register_id, cpu)
+        pointed_value = cpu.memory.read(register.get())
+        result = cpu.register_a.get() - pointed_value
+        borrowed_bit_4 = (cpu.register_a.get()) % 16 > (pointed_value % 16)
+        cpu.flags.set_all(
+            zero=result == 0,
+            negative=True,
+            half_carry=borrowed_bit_4,
+            carry=result < 0,
+        )
+    return instruction
+
+
+def compare_immediate_to_a(cpu, immediate):
+    result = cpu.register_a.get() - immediate
+    borrowed_bit_4 = (cpu.register_a.get()) % 16 > (immediate % 16)
+    cpu.flags.set_all(
+        zero=result == 0,
+        negative=True,
+        half_carry=borrowed_bit_4,
+        carry=result < 0,
+    )
