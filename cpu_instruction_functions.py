@@ -1,6 +1,10 @@
 from cpu_registers import get_register
 
 
+def immediates_to_16bit(first_immediate, second_immediate):
+    return first_immediate + (second_immediate << 8)
+
+
 def twos_complement(val, bits):
     if (val & (1 << (bits - 1))) != 0:
         val = val - (1 << bits)
@@ -9,6 +13,24 @@ def twos_complement(val, bits):
 
 def nop(cpu):
     pass
+
+
+def call(cpu, first_immediate, second_immediate):
+    cpu.stack_push(
+        cpu.register_program_counter.lower_eight_bit_register.get())
+    cpu.stack_push(
+        cpu.register_program_counter.higher_eight_bit_register.get())
+    cpu.register_program_counter.set(
+        immediates_to_16bit(first_immediate, second_immediate)
+    )
+
+
+def push(register_id):
+    def instruction(cpu):
+        register = get_register(register_id, cpu)
+        cpu.stack_push(register.lower_eight_bit_register.get())
+        cpu.stack_push(register.higher_eight_bit_register.get())
+    return instruction
 
 
 def load_8bit_immediate_to_register(register_id):
@@ -66,7 +88,9 @@ def load_immediate_address_to_register(target_register_id):
     def instruction(cpu, first_immediate, second_immediate):
         target_register = get_register(target_register_id, cpu)
         target_register.set(
-            cpu.memory.read(first_immediate + (second_immediate << 8))
+            cpu.memory.read(
+                immediates_to_16bit(first_immediate, second_immediate)
+            )
         )
     return instruction
 
@@ -75,9 +99,10 @@ def put_register_to_immediate_address(register_id):
     def instruction(cpu, first_immediate, second_immediate):
         register = get_register(register_id, cpu)
         cpu.memory.write(
-            first_immediate + (second_immediate << 8),
+            immediates_to_16bit(first_immediate, second_immediate),
             register.get()
         )
+
     return instruction
 
 

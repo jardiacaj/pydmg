@@ -6,6 +6,7 @@ D = 'D'
 E = 'E'
 H = 'H'
 L = 'L'
+AF = 'AF'
 BC = 'BC'
 DE = 'DE'
 HL = 'HL'
@@ -33,6 +34,8 @@ def get_register(index, cpu):
         return cpu.register_h
     elif index == L:
         return cpu.register_l
+    elif index == AF:
+        return cpu.register_af
     elif index == BC:
         return cpu.register_bc
     elif index == DE:

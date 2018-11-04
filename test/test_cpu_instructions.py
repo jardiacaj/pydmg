@@ -15,6 +15,23 @@ class SimpleCPUInstructionTestCase(unittest.TestCase):
         self.assertEqual(self.cpu.total_clock_cycle_count, 4)
         self.assertEqual(self.cpu.register_program_counter.get(), 1)
 
+    def test_CALL(self):
+        self.memory.data = [0xCD, 0x12, 0x00] + [0]*2**16
+        self.cpu.tick()
+        self.assertEqual(self.cpu.total_clock_cycle_count, 12)
+        self.assertEqual(self.cpu.register_program_counter.get(), 0x12)
+        self.assertEqual(self.cpu.stack_pop(), 0x00)
+        self.assertEqual(self.cpu.stack_pop(), 0x03)
+
+    def test_PUSH(self):
+        self.memory.data = [0xF5] + [0]*2**16
+        self.cpu.register_a.set(0x12)
+        self.cpu.tick()
+        self.assertEqual(self.cpu.total_clock_cycle_count, 16)
+        self.assertEqual(self.cpu.register_program_counter.get(), 0x01)
+        self.assertEqual(self.cpu.stack_pop(), 0x12)
+        self.assertEqual(self.cpu.stack_pop(), 0x00)
+
     def test_INC_C(self):
         self.memory.data = [0x0C]
         self.cpu.tick()

@@ -110,6 +110,15 @@ def and_instruction(register):
     )
 
 
+def push(register):
+    return (
+        "Push register pair {} to stack and decrement SP twice".format(
+            register),
+        "PUSH {}".format(register), 1, 16, None,
+        cpu_instruction_functions.push(register)
+    )
+
+
 instructions = {
 
     0x00: ("No operation", "NOP", 1, 4, None, cpu_instruction_functions.nop),
@@ -246,6 +255,15 @@ instructions = {
 
     0xF0: ("Load value at address ($FF00 + immediate) into A",
            "LD A,(d8)", 2, 12, None, cpu_instruction_functions.ldh_a_n),
+
+    0xCD: ("Push address of next instruction onto stack and then jump to "
+           "immediate address",
+           "CALL d16", 3, 12, None, cpu_instruction_functions.call),
+
+    0xF5: push(cpu_registers.AF),
+    0xC5: push(cpu_registers.BC),
+    0xD5: push(cpu_registers.DE),
+    0xE5: push(cpu_registers.HL),
 
 }
 

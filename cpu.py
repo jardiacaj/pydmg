@@ -30,8 +30,16 @@ class CPU:
             self.load_next_instruction()
             self.execute_loaded_instruction()
         except Exception as e:
-            self.dump()
+            logging.error(self.dump())
             raise e
+
+    def stack_push(self, byte):
+        self.memory.write(self.register_stack_pointer.get(), byte)
+        self.register_stack_pointer.add(-1)
+
+    def stack_pop(self):
+        self.register_stack_pointer.add(1)
+        return self.memory.read(self.register_stack_pointer.get())
 
     def execute_loaded_instruction(self):
         instruction_name, instruction_mnemonic, \
@@ -45,6 +53,9 @@ class CPU:
         for i in range(self.bytes_before_immediates):
             immediates.pop(0)
 
+        self.total_clock_cycle_count += instruction_clock_cycles
+        self.register_program_counter.add(instruction_length_in_bytes)
+
         logging.debug(
             "PC: {:02X}: {}, immediates: {}".format(
                 self.register_program_counter.get(),
@@ -53,8 +64,6 @@ class CPU:
             )
         )
         instruction_implementation(self, *immediates)
-        self.total_clock_cycle_count += instruction_clock_cycles
-        self.register_program_counter.add(instruction_length_in_bytes)
 
     def load_next_instruction(self):
         pc = self.register_program_counter.get()
@@ -82,8 +91,7 @@ class CPU:
             )
 
     def dump(self):
-        print(
-            """
+        return """ # CPU Dump #
             {cycles} total clock cycles
             AF 0x{af:04X} Z={z} N={n} H={h} C={c}
             BC 0x{bc:04X}
@@ -104,4 +112,3 @@ class CPU:
                 sp=self.register_stack_pointer.get(),
                 pc=self.register_program_counter.get(),
             )
-        )
