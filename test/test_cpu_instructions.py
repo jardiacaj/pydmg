@@ -72,7 +72,28 @@ class SimpleCPUInstructionTestCase(unittest.TestCase):
         self.assertEqual(self.cpu.register_c.get(), 0x00)
         self.assertTrue(self.cpu.flags.get_zero_flag())
         self.assertFalse(self.cpu.flags.get_negative_flag())
+        self.assertTrue(self.cpu.flags.get_half_carry_flag())
+
+    def test_DEC_A(self):
+        self.memory.data = [0x3D]
+        self.cpu.tick()
+        self.assertEqual(self.cpu.total_clock_cycle_count, 4)
+        self.assertEqual(self.cpu.register_program_counter.get(), 1)
+        self.assertEqual(self.cpu.register_a.get(), 0xFF)
+        self.assertFalse(self.cpu.flags.get_zero_flag())
+        self.assertTrue(self.cpu.flags.get_negative_flag())
         self.assertFalse(self.cpu.flags.get_half_carry_flag())
+
+    def test_DEC_C_zero(self):
+        self.memory.data = [0x3D]
+        self.cpu.register_a.set(0x01)
+        self.cpu.tick()
+        self.assertEqual(self.cpu.total_clock_cycle_count, 4)
+        self.assertEqual(self.cpu.register_program_counter.get(), 1)
+        self.assertEqual(self.cpu.register_a.get(), 0x00)
+        self.assertTrue(self.cpu.flags.get_zero_flag())
+        self.assertTrue(self.cpu.flags.get_negative_flag())
+        self.assertTrue(self.cpu.flags.get_half_carry_flag())
 
     def test_LD_C_A(self):
         self.memory.data = [0x4F]

@@ -79,6 +79,14 @@ def increment(register):
     )
 
 
+def decrement(register):
+    return (
+        "Decrement {}".format(register),
+        "DEC {}".format(register), 1, 4, 'Z1H-',
+        cpu_instruction_functions.decrement_register(register)
+    )
+
+
 def load_8bit_register_to_register(target, source):
     return (
         "Put {} into {}".format(source, target),
@@ -161,6 +169,14 @@ instructions = {
     0x1C: increment(cpu_registers.E),
     0x24: increment(cpu_registers.H),
     0x2C: increment(cpu_registers.L),
+
+    0x3D: decrement(cpu_registers.A),
+    0x05: decrement(cpu_registers.B),
+    0x0D: decrement(cpu_registers.C),
+    0x15: decrement(cpu_registers.D),
+    0x1D: decrement(cpu_registers.E),
+    0x25: decrement(cpu_registers.H),
+    0x2D: decrement(cpu_registers.L),
 
     0x7F: load_8bit_register_to_register(cpu_registers.A, cpu_registers.A),
     0x78: load_8bit_register_to_register(cpu_registers.A, cpu_registers.B),
