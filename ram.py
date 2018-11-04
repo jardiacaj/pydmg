@@ -9,15 +9,19 @@ class MemoryFault(Exception):
 
 class MemoryZone:
     def __init__(self, name, size, base_address, alt_base_address=None,
-                 is_rom=False):
+                 is_rom=False, is_implemented=True):
         self.name = name
         self.data = [0] * size
         self.base_address = base_address
         self.alt_base_address = alt_base_address
         self.is_rom = is_rom
+        self.is_implemented = is_implemented
         self.is_enabled = True
 
     def read(self, address):
+        if not self.is_implemented:
+            raise NotImplementedError('Memory {} not implmemented'.format(
+                self.name))
         try:
             return self.data[address - self.base_address]
         except IndexError as e:
@@ -34,6 +38,9 @@ class MemoryZone:
                     ))
 
     def write(self, address, value):
+        if not self.is_implemented:
+            raise NotImplementedError('Memory {} not implmemented'.format(
+                self.name))
         if self.is_rom:
             raise MemoryFault("Wrote to ROM address {:04X}".format(address))
         try:
@@ -57,16 +64,20 @@ class DMGMemory:
         self.boot_rom = MemoryZone(
             'boot ROM', size=0x0100, base_address=0x0000, is_rom=True)
         self.cartridge_rom = MemoryZone(
-            'cartridge ROM', size=0x8000, base_address=0x0000, is_rom=True)
+            'cartridge ROM', size=0x8000, base_address=0x0000,
+            is_implemented=False, is_rom=True)
         self.video_ram = MemoryZone(
             'video RAM', size=0x2000, base_address=0x8000)
         self.external_ram = MemoryZone(
-            'external RAM', size=0x2000, base_address=0xA000)
+            'external RAM', size=0x2000, base_address=0xA000,
+            is_implemented=False)
         self.internal_ram = MemoryZone(
             'internal RAM', size=0x2000, base_address=0xC000,
+            is_implemented=False,
             alt_base_address=0xE000)
         self.oam_ram = MemoryZone(
-            'OAM RAM', size=0xA0, base_address=0xFE00)
+            'OAM RAM', size=0xA0, base_address=0xFE00,
+            is_implemented=False)
         self.io_ram = MemoryZone(
             'IO RAM', size=0x80, base_address=0xFF00)
         self.hram = MemoryZone(
