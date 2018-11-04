@@ -1,16 +1,16 @@
 import unittest
 
 from cpu import CPU
-from ram import RAM
+from ram import DMGMemory
 
 
 class INCDECCPUInstructionTestCase(unittest.TestCase):
     def setUp(self):
-        self.memory = RAM()
+        self.memory = DMGMemory()
         self.cpu = CPU(self.memory)
 
     def test_INC_C(self):
-        self.memory.data = [0x0C]
+        self.memory.boot_rom.data = [0x0C]
         self.cpu.tick()
         self.assertEqual(self.cpu.total_clock_cycle_count, 4)
         self.assertEqual(self.cpu.register_program_counter.get(), 1)
@@ -20,7 +20,7 @@ class INCDECCPUInstructionTestCase(unittest.TestCase):
         self.assertFalse(self.cpu.flags.get_half_carry_flag())
 
     def test_INC_C_half_carry(self):
-        self.memory.data = [0x0C]
+        self.memory.boot_rom.data = [0x0C]
         self.cpu.register_c.set(0x0F)
         self.cpu.tick()
         self.assertEqual(self.cpu.total_clock_cycle_count, 4)
@@ -31,7 +31,7 @@ class INCDECCPUInstructionTestCase(unittest.TestCase):
         self.assertTrue(self.cpu.flags.get_half_carry_flag())
 
     def test_INC_C_zero(self):
-        self.memory.data = [0x0C]
+        self.memory.boot_rom.data = [0x0C]
         self.cpu.register_c.set(0xFF)
         self.cpu.tick()
         self.assertEqual(self.cpu.total_clock_cycle_count, 4)
@@ -42,7 +42,7 @@ class INCDECCPUInstructionTestCase(unittest.TestCase):
         self.assertTrue(self.cpu.flags.get_half_carry_flag())
 
     def test_DEC_A(self):
-        self.memory.data = [0x3D]
+        self.memory.boot_rom.data = [0x3D]
         self.cpu.tick()
         self.assertEqual(self.cpu.total_clock_cycle_count, 4)
         self.assertEqual(self.cpu.register_program_counter.get(), 1)
@@ -52,7 +52,7 @@ class INCDECCPUInstructionTestCase(unittest.TestCase):
         self.assertFalse(self.cpu.flags.get_half_carry_flag())
 
     def test_DEC_C_zero(self):
-        self.memory.data = [0x3D]
+        self.memory.boot_rom.data = [0x3D]
         self.cpu.register_a.set(0x01)
         self.cpu.tick()
         self.assertEqual(self.cpu.total_clock_cycle_count, 4)
@@ -63,7 +63,7 @@ class INCDECCPUInstructionTestCase(unittest.TestCase):
         self.assertTrue(self.cpu.flags.get_half_carry_flag())
 
     def test_INC_BC(self):
-        self.memory.data = [0x03, 0x03]
+        self.memory.boot_rom.data = [0x03, 0x03]
         self.cpu.register_bc.set(0xFFFF)
         self.cpu.tick()
         self.assertEqual(self.cpu.total_clock_cycle_count, 8)
@@ -75,7 +75,7 @@ class INCDECCPUInstructionTestCase(unittest.TestCase):
         self.assertEqual(self.cpu.register_bc.get(), 0x0001)
 
     def test_DEC_BC(self):
-        self.memory.data = [0x0B, 0x0B]
+        self.memory.boot_rom.data = [0x0B, 0x0B]
         self.cpu.register_bc.set(0x0001)
         self.cpu.tick()
         self.assertEqual(self.cpu.total_clock_cycle_count, 8)

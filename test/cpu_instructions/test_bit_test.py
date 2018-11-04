@@ -1,16 +1,16 @@
 import unittest
 
 from cpu import CPU
-from ram import RAM
+from ram import DMGMemory
 
 
 class BitTestInstructionTestCase(unittest.TestCase):
     def setUp(self):
-        self.memory = RAM()
+        self.memory = DMGMemory()
         self.cpu = CPU(self.memory)
 
     def test_BIT_7_H_on_one(self):
-        self.memory.data = [0xCB, 0x7C]
+        self.memory.boot_rom.data = [0xCB, 0x7C]
         self.cpu.register_h.set(0b10000000)
         self.cpu.tick()
         self.assertEqual(self.cpu.total_clock_cycle_count, 8)
@@ -20,7 +20,7 @@ class BitTestInstructionTestCase(unittest.TestCase):
         self.assertTrue(self.cpu.flags.get_half_carry_flag())
 
     def test_BIT_7_H_on_zero(self):
-        self.memory.data = [0xCB, 0x7C]
+        self.memory.boot_rom.data = [0xCB, 0x7C]
         self.cpu.register_h.set(0)
         self.cpu.tick()
         self.assertEqual(self.cpu.total_clock_cycle_count, 8)
@@ -30,7 +30,7 @@ class BitTestInstructionTestCase(unittest.TestCase):
         self.assertTrue(self.cpu.flags.get_half_carry_flag())
 
     def test_BIT_1_HL_pointer_on_one(self):
-        self.memory.data = [0xCB, 0x4E]
+        self.memory.boot_rom.data = [0xCB, 0x4E]
         self.cpu.register_hl.set(0x0001)
         self.cpu.tick()
         self.assertEqual(self.cpu.total_clock_cycle_count, 16)
@@ -40,7 +40,7 @@ class BitTestInstructionTestCase(unittest.TestCase):
         self.assertTrue(self.cpu.flags.get_half_carry_flag())
 
     def test_BIT_0_HL_pointer_on_zero(self):
-        self.memory.data = [0xCB, 0x46]
+        self.memory.boot_rom.data = [0xCB, 0x46]
         self.cpu.register_hl.set(0x0001)
         self.cpu.tick()
         self.assertEqual(self.cpu.total_clock_cycle_count, 16)

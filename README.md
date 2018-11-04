@@ -1,5 +1,8 @@
 # Resources
 
+The Ultimate Game Boy Talk (33c3)
+https://www.youtube.com/watch?v=HyzD8pNlpwI
+
 Game Boy CPU Manual
 http://marc.rawer.de/Gameboy/Docs/GBCPUman.pdf
 

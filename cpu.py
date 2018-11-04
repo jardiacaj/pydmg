@@ -1,6 +1,7 @@
 import logging
 
 import cpu_instruction_table
+from ram import MemoryFault
 from register import Register16bit
 
 
@@ -33,11 +34,11 @@ class CPU:
             logging.error(self.dump())
             raise e
 
-    def stack_push(self, byte):
+    def stack_push_byte(self, byte):
         self.register_stack_pointer.add(-1)
         self.memory.write(self.register_stack_pointer.get(), byte)
 
-    def stack_pop(self):
+    def stack_pop_byte(self):
         value = self.memory.read(self.register_stack_pointer.get())
         self.register_stack_pointer.add(1)
         return value
@@ -120,10 +121,13 @@ class CPU:
             )
 
     def stack_dump(self):
-        return "\n".join(
-            (
-                "            {:04X}".format(self.memory.read(address))
-                for address
-                in range(self.register_stack_pointer.get(), 0xFFFE)
+        try:
+            return "\n".join(
+                (
+                    "            {:04X}".format(self.memory.read(address))
+                    for address
+                    in range(self.register_stack_pointer.get(), 0xFFFE)
+                )
             )
-        )
+        except MemoryFault as e:
+            return "Dump failed to {}".format(e)

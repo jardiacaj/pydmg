@@ -16,14 +16,14 @@ def nop(cpu):
 
 
 def ret(cpu):
-    cpu.register_program_counter.higher_eight_bit_register.set(cpu.stack_pop())
-    cpu.register_program_counter.lower_eight_bit_register.set(cpu.stack_pop())
+    cpu.register_program_counter.higher_eight_bit_register.set(cpu.stack_pop_byte())
+    cpu.register_program_counter.lower_eight_bit_register.set(cpu.stack_pop_byte())
 
 
 def call(cpu, first_immediate, second_immediate):
-    cpu.stack_push(
+    cpu.stack_push_byte(
         cpu.register_program_counter.lower_eight_bit_register.get())
-    cpu.stack_push(
+    cpu.stack_push_byte(
         cpu.register_program_counter.higher_eight_bit_register.get())
     cpu.register_program_counter.set(
         immediates_to_16bit(first_immediate, second_immediate)
@@ -33,16 +33,16 @@ def call(cpu, first_immediate, second_immediate):
 def push(register_id):
     def instruction(cpu):
         register = get_register(register_id, cpu)
-        cpu.stack_push(register.lower_eight_bit_register.get())
-        cpu.stack_push(register.higher_eight_bit_register.get())
+        cpu.stack_push_byte(register.lower_eight_bit_register.get())
+        cpu.stack_push_byte(register.higher_eight_bit_register.get())
     return instruction
 
 
 def pop(register_id):
     def instruction(cpu):
         register = get_register(register_id, cpu)
-        register.higher_eight_bit_register.set(cpu.stack_pop())
-        register.lower_eight_bit_register.set(cpu.stack_pop())
+        register.higher_eight_bit_register.set(cpu.stack_pop_byte())
+        register.lower_eight_bit_register.set(cpu.stack_pop_byte())
     return instruction
 
 

@@ -1,12 +1,12 @@
 import unittest
 
 from cpu import CPU
-from ram import RAM
+from ram import DMGMemory
 
 
 class DefaultCPUTestCase(unittest.TestCase):
     def setUp(self):
-        self.memory = RAM()
+        self.memory = DMGMemory()
         self.cpu = CPU(self.memory)
 
     def testDefaultCPU(self):
@@ -21,5 +21,5 @@ class DefaultCPUTestCase(unittest.TestCase):
         self.assertEqual(self.cpu.register_program_counter.get(), 1)
 
     def testInvalidInstruction(self):
-        self.memory.data[0] = 0xFD
+        self.memory.boot_rom.data[0] = 0xFD
         self.assertRaises(NotImplementedError, self.cpu.tick)
