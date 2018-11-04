@@ -15,6 +15,11 @@ def nop(cpu):
     pass
 
 
+def ret(cpu):
+    cpu.register_program_counter.higher_eight_bit_register.set(cpu.stack_pop())
+    cpu.register_program_counter.lower_eight_bit_register.set(cpu.stack_pop())
+
+
 def call(cpu, first_immediate, second_immediate):
     cpu.stack_push(
         cpu.register_program_counter.lower_eight_bit_register.get())

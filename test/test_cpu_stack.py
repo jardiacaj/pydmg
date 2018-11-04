@@ -14,10 +14,10 @@ class DefaultCPUStackTestCase(unittest.TestCase):
     def testPushPopStack(self):
         self.cpu.stack_push(0x12)
         self.assertEqual(self.cpu.register_stack_pointer.get(), 0xFFFD)
-        self.assertEqual(self.memory.read(0xFFFE), 0x12)
+        self.assertEqual(self.memory.read(0xFFFD), 0x12)
         self.cpu.stack_push(0x24)
         self.assertEqual(self.cpu.register_stack_pointer.get(), 0xFFFC)
-        self.assertEqual(self.memory.read(0xFFFD), 0x24)
+        self.assertEqual(self.memory.read(0xFFFC), 0x24)
         popped = self.cpu.stack_pop()
         self.assertEqual(self.cpu.register_stack_pointer.get(), 0xFFFD)
         self.assertEqual(popped, 0x24)

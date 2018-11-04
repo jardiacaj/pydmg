@@ -329,6 +329,9 @@ instructions = {
     0xF0: ("Load value at address ($FF00 + immediate) into A",
            "LD A,(d8)", 2, 12, None, cpu_instruction_functions.ldh_a_n),
 
+    0xC9: ("Pop address from stack and then jump to that address",
+           "RET", 1, 8, None, cpu_instruction_functions.ret),
+
     0xCD: ("Push address of next instruction onto stack and then jump to "
            "immediate address",
            "CALL d16", 3, 12, None, cpu_instruction_functions.call),

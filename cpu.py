@@ -35,12 +35,13 @@ class CPU:
             raise e
 
     def stack_push(self, byte):
-        self.memory.write(self.register_stack_pointer.get(), byte)
         self.register_stack_pointer.add(-1)
+        self.memory.write(self.register_stack_pointer.get(), byte)
 
     def stack_pop(self):
+        value = self.memory.read(self.register_stack_pointer.get())
         self.register_stack_pointer.add(1)
-        return self.memory.read(self.register_stack_pointer.get())
+        return value
 
     def load_next_instruction(self):
         pc = self.register_program_counter.get()
