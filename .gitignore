@@ -1,6 +1,7 @@
 .idea
 *.pyc
 venv
+pypy
 
 
 dmg_boot.bin
