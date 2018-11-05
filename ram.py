@@ -93,6 +93,29 @@ class DMGMemory:
                 bytes_from_file(cartridge_romfile_path)):
             self.cartridge_rom.data[address] = rom_byte
         logging.debug("Loaded {} cartridge rom bytes".format(address+1))
+        logging.info(
+            "Cartridge name: {}".format(
+                self.read_cartridge_name()
+            )
+        )
+        if self.cartridge_is_gbc():
+            logging.info("GBC cart")
+        else:
+            logging.info("Non-GBC cart")
+        if self.cartridge_is_sgb():
+            logging.info("SGB cart")
+        else:
+            logging.info("Non-SGB cart")
+
+    def read_cartridge_name(self):
+        return "".join(chr(byte) for byte
+                       in self.cartridge_rom.data[0x0134:0x0142])
+
+    def cartridge_is_gbc(self):
+        return self.cartridge_rom.data[0x143] == 0x80
+
+    def cartridge_is_sgb(self):
+        return self.cartridge_rom.data[0x146] == 0x03
 
     def address_to_memory(self, address):
         if address > 0xFFFF:

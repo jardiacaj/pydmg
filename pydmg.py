@@ -28,7 +28,7 @@ if __name__ == "__main__":
     parser.add_argument("cartridge_romfile")
     parser.add_argument("--boot-romfile", default="dmg_boot.bin")
     parser.add_argument("--log-level",
-                        default=logging._levelToName[logging.DEBUG],
+                        default=logging._levelToName[logging.INFO],
                         choices=(
                             logging._levelToName[logging.DEBUG],
                             logging._levelToName[logging.INFO],
@@ -39,7 +39,8 @@ if __name__ == "__main__":
     parser.add_argument("--debugger", action='store_true')
     args = parser.parse_args()
 
-    logging.basicConfig(level=logging._nameToLevel[args.log_level])
+    logging.basicConfig(level=logging.DEBUG if args.debugger
+                        else logging._nameToLevel[args.log_level])
 
     emulator = PyDMG(
         boot_romfile_path=args.boot_romfile,
