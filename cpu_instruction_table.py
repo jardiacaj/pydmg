@@ -131,6 +131,10 @@ instructions = {
     0x7E: load_pointer_to_register(cpu_registers.A, cpu_registers.HL),
     0xFA: load_immediate_pointer_to_register(cpu_registers.A),
 
+    0x18: ("Relative jump",
+           "JR d8", 2, 8, None,
+           cpu_instruction_implementation.relative_jump),
+
     0x20: ("Relative jump if not zero",
            "JR NZ,d8", 2, 8, None,
            cpu_instruction_implementation.relative_jump_if_not_zero),

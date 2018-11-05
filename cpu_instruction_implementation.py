@@ -171,6 +171,10 @@ def decrement_16bit_register(register_id):
     return instruction
 
 
+def relative_jump(cpu, immediate):
+    cpu.register_program_counter.add(twos_complement(immediate, 8))
+
+
 def relative_jump_if_not_zero(cpu, immediate):
     if not cpu.flags.get_zero_flag():
         cpu.register_program_counter.add(twos_complement(immediate, 8))
