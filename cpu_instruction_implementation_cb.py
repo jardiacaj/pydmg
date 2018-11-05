@@ -4,8 +4,8 @@ from cpu_registers import get_register
 def register_bit_test(register_id, bit):
     def instruction(cpu):
         register = get_register(register_id, cpu)
-        register = register.get()
-        if register & (1 << bit):
+        register_value = register.get()
+        if register_value & (1 << bit):
             cpu.flags.reset_zero_flag()
         else:
             cpu.flags.set_zero_flag()

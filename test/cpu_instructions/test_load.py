@@ -10,6 +10,14 @@ class LoadInstructionTestCase(unittest.TestCase):
         self.memory.boot_rom.is_rom = False
         self.cpu = CPU(self.memory)
 
+    def test_LD_A_E(self):
+        self.memory.boot_rom.data = [0x7B]
+        self.cpu.register_e.set(0x12)
+        self.cpu.tick()
+        self.assertEqual(self.cpu.total_clock_cycle_count, 4)
+        self.assertEqual(self.cpu.register_program_counter.get(), 1)
+        self.assertEqual(self.cpu.register_a.get(), 0x12)
+
     def test_LD_C_A(self):
         self.memory.boot_rom.data = [0x4F]
         self.cpu.register_a.set(0x12)

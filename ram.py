@@ -20,8 +20,7 @@ class MemoryZone:
 
     def read(self, address):
         if not self.is_implemented:
-            raise NotImplementedError('Memory {} not implmemented'.format(
-                self.name))
+            logging.error('Memory {} not implmemented'.format(self.name))
         try:
             return self.data[address - self.base_address]
         except IndexError as e:
@@ -39,8 +38,7 @@ class MemoryZone:
 
     def write(self, address, value):
         if not self.is_implemented:
-            raise NotImplementedError('Memory {} not implmemented'.format(
-                self.name))
+            logging.error('Memory {} not implmemented'.format(self.name))
         if self.is_rom:
             raise MemoryFault("Wrote to ROM address {:04X}".format(address))
         try:
@@ -64,10 +62,10 @@ class DMGMemory:
         self.boot_rom = MemoryZone(
             'boot ROM', size=0x0100, base_address=0x0000, is_rom=True)
         self.cartridge_rom = MemoryZone(
-            'cartridge ROM', size=0x8000, base_address=0x0000,
-            is_implemented=False, is_rom=True)
+            'cartridge ROM', size=0x8000, base_address=0x0000, is_rom=True)
         self.video_ram = MemoryZone(
-            'video RAM', size=0x2000, base_address=0x8000)
+            'video RAM', size=0x2000, base_address=0x8000,
+            is_implemented=False)
         self.external_ram = MemoryZone(
             'external RAM', size=0x2000, base_address=0xA000,
             is_implemented=False)
@@ -79,18 +77,22 @@ class DMGMemory:
             'OAM RAM', size=0xA0, base_address=0xFE00,
             is_implemented=False)
         self.io_ram = MemoryZone(
-            'IO RAM', size=0x80, base_address=0xFF00)
+            'IO RAM', size=0x80, base_address=0xFF00,
+            is_implemented=False)
         self.hram = MemoryZone(
             'HRAM', size=0x80, base_address=0xFF80)
 
-    def load_boot_rom(self, bootromfile_path):
-        print("Reading boot ROM {}".format(bootromfile_path))
-        for address, rom_byte in enumerate(bytes_from_file(bootromfile_path)):
+    def load_boot_rom(self, boot_romfile_path):
+        print("Reading boot ROM {}".format(boot_romfile_path))
+        for address, rom_byte in enumerate(bytes_from_file(boot_romfile_path)):
             self.boot_rom.data[address] = rom_byte
         logging.debug("Loaded {} boot rom bytes".format(address+1))
 
-    def load_cartridge_rom(self, romfile_path):
-        logging.warning("Cartridge ROM loading not implemented.")
+    def load_cartridge_rom(self, cartridge_romfile_path):
+        for address, rom_byte in enumerate(
+                bytes_from_file(cartridge_romfile_path)):
+            self.cartridge_rom.data[address] = rom_byte
+        logging.debug("Loaded {} cartridge rom bytes".format(address+1))
 
     def address_to_memory(self, address):
         if address > 0xFFFF:

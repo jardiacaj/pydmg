@@ -1,5 +1,9 @@
 # Resources
 
+
+Boot ROM disassemlby
+https://gist.github.com/drhelius/6063288
+
 The Ultimate Game Boy Talk (33c3)
 https://www.youtube.com/watch?v=HyzD8pNlpwI
 

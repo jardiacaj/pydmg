@@ -72,7 +72,8 @@ def load_register_to_register(target_register_id, source_register_id):
     def instruction(cpu):
         target = get_register(target_register_id, cpu)
         source = get_register(source_register_id, cpu)
-        target.set(source.get())
+        source_value = source.get()
+        target.set(source_value)
     return instruction
 
 

@@ -25,7 +25,12 @@ main_menu = [
             {
                 'key': 'd',
                 'name': 'Dump CPU',
-                'value': 'dump'
+                'value': 'cpu dump'
+            },
+            {
+                'key': 'm',
+                'name': 'Dump memory',
+                'value': 'memory dump'
             },
             Separator(),
             {
@@ -45,6 +50,14 @@ run_to_input = [
     }
 ]
 
+address_to_dump = [
+    {
+        'type': 'input',
+        'name': 'address',
+        'message': 'Run up to address (hex)',
+    }
+]
+
 
 class DMGDebugger:
     def __init__(self, emulator):
@@ -56,8 +69,11 @@ class DMGDebugger:
             if response['main'] == 'step':
                 self.emulator.step()
 
-            elif response['main'] == 'dump':
+            elif response['main'] == 'cpu dump':
                 print(self.emulator.cpu.dump())
+
+            elif response['main'] == 'memory dump':
+                print(self.emulator.memory)
 
             elif response['main'] == 'run-to':
                 response = prompt(run_to_input)
