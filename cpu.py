@@ -123,7 +123,7 @@ class CPU:
             Stack
 {stack_dump}
             """.format(
-                cycles=self.total_clock_cycles_ran,
+                cycles=self.total_clock_cycles_ran // 4,
                 af=self.register_af.get(),
                 z=self.flags.get_zero_flag(),
                 n=self.flags.get_negative_flag(),

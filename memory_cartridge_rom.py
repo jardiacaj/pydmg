@@ -100,7 +100,6 @@ class MemoryZoneCartridgeRom(MemoryZone):
         if self.stated_checksum() != self.actual_checksum():
             logging.warning("Cartridge checksum mismatch")
 
-
     def read_cartridge_name(self):
         return "".join(chr(byte) for byte
                        in self.data[0x0134:0x0142])

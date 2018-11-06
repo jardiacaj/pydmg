@@ -24,6 +24,7 @@ class PyDMG:
         self.sound.memory = self.memory
         self.cpu = CPU(self.memory)
 
+    # DMG CPU instructions take at least 4 clocks
     def cpu_step(self):
         self.clock()
         self.clock()
