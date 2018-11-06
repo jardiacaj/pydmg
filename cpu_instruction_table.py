@@ -205,16 +205,16 @@ instructions = {
     0xFE: compare_immediate(),
 
     0xE0: ("Put A into memory address $FF00+n",
-           "LDH (d8),A", 2, 12, None, cpu_instruction_implementation.ldh_n_a),
+           "LDH ($FF00+d8),A", 2, 12, None, cpu_instruction_implementation.ldh_n_a),
 
     0xE2: ("Put A into address $FF00 + register C",
-           "LD (C),A", 1, 8, None, cpu_instruction_implementation.ld_c_a),
+           "LD ($FF00+C),A", 1, 8, None, cpu_instruction_implementation.ld_c_a),
 
     0xF2: ("Load value at address ($FF00 + C) into A",
-           "LD A,(C)", 1, 8, None, cpu_instruction_implementation.ld_a_c),
+           "LD A,($FF00+C)", 1, 8, None, cpu_instruction_implementation.ld_a_c),
 
     0xF0: ("Load value at address ($FF00 + immediate) into A",
-           "LD A,(d8)", 2, 12, None, cpu_instruction_implementation.ldh_a_n),
+           "LD A,($FF00+d8)", 2, 12, None, cpu_instruction_implementation.ldh_a_n),
 
     0xC9: ("Pop address from stack and then jump to that address",
            "RET", 1, 8, None, cpu_instruction_implementation.ret),

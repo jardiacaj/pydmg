@@ -170,6 +170,6 @@ def compare_pointer(register):
 def compare_immediate():
     return (
         "Compare A with d8 (like A - n without result)",
-        "CP (d8)", 2, 8, "Z1HC",
+        "CP d8", 2, 8, "Z1HC",
         cpu_instruction_implementation.compare_immediate_to_a
     )
