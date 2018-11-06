@@ -3,7 +3,7 @@ import logging
 
 from cpu import CPU
 from debugger import DMGDebugger
-from ram import DMGMemory
+from memory import DMGMemory
 
 
 class PyDMG:

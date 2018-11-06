@@ -1,7 +1,7 @@
 import unittest
 
 from cpu import CPU
-from ram import DMGMemory
+from memory import DMGMemory
 
 
 class JumpInstructionTestCase(unittest.TestCase):
