@@ -12,8 +12,8 @@ class ALUInstructionTestCase(unittest.TestCase):
     def test_XOR_A(self):
         self.memory.boot_rom.data = [0xAF]
         self.cpu.register_a.set(0x12)
-        self.cpu.tick()
-        self.assertEqual(self.cpu.total_clock_cycle_count, 4)
+        self.cpu.step()
+        self.assertEqual(self.cpu.total_clock_cycles_ran, 4)
         self.assertEqual(self.cpu.register_program_counter.get(), 1)
         self.assertEqual(self.cpu.register_a.get(), 0)
 
@@ -21,8 +21,8 @@ class ALUInstructionTestCase(unittest.TestCase):
         self.memory.boot_rom.data = [0xA0]
         self.cpu.register_a.set(0b10100)
         self.cpu.register_b.set(0b11001)
-        self.cpu.tick()
-        self.assertEqual(self.cpu.total_clock_cycle_count, 4)
+        self.cpu.step()
+        self.assertEqual(self.cpu.total_clock_cycles_ran, 4)
         self.assertEqual(self.cpu.register_program_counter.get(), 1)
         self.assertEqual(self.cpu.register_a.get(), 0b10000)
         self.assertFalse(self.cpu.flags.get_zero_flag())
@@ -32,8 +32,8 @@ class ALUInstructionTestCase(unittest.TestCase):
 
     def test_CMP_A(self):
         self.memory.boot_rom.data[0x0000] = 0xBF
-        self.cpu.tick()
-        self.assertEqual(self.cpu.total_clock_cycle_count, 4)
+        self.cpu.step()
+        self.assertEqual(self.cpu.total_clock_cycles_ran, 4)
         self.assertEqual(self.cpu.register_program_counter.get(), 1)
         self.assertTrue(self.cpu.flags.get_zero_flag())
         self.assertTrue(self.cpu.flags.get_negative_flag())
@@ -44,8 +44,8 @@ class ALUInstructionTestCase(unittest.TestCase):
         self.memory.boot_rom.data[0x0000] = 0xB8
         self.cpu.register_a.set(0xFF)
         self.cpu.register_b.set(0x01)
-        self.cpu.tick()
-        self.assertEqual(self.cpu.total_clock_cycle_count, 4)
+        self.cpu.step()
+        self.assertEqual(self.cpu.total_clock_cycles_ran, 4)
         self.assertEqual(self.cpu.register_program_counter.get(), 1)
         self.assertFalse(self.cpu.flags.get_zero_flag())
         self.assertTrue(self.cpu.flags.get_negative_flag())
@@ -57,8 +57,8 @@ class ALUInstructionTestCase(unittest.TestCase):
         self.memory.boot_rom.data[0x0001] = 0x01
         self.memory.boot_rom.data[0x0002] = 0x00
         self.cpu.register_a.set(0x00)
-        self.cpu.tick()
-        self.assertEqual(self.cpu.total_clock_cycle_count, 8)
+        self.cpu.step()
+        self.assertEqual(self.cpu.total_clock_cycles_ran, 8)
         self.assertEqual(self.cpu.register_program_counter.get(), 1)
         self.assertFalse(self.cpu.flags.get_zero_flag())
         self.assertTrue(self.cpu.flags.get_negative_flag())
@@ -69,8 +69,8 @@ class ALUInstructionTestCase(unittest.TestCase):
         self.memory.boot_rom.data[0x0000] = 0xFE
         self.memory.boot_rom.data[0x0001] = 0x80
         self.cpu.register_a.set(0x7F)
-        self.cpu.tick()
-        self.assertEqual(self.cpu.total_clock_cycle_count, 8)
+        self.cpu.step()
+        self.assertEqual(self.cpu.total_clock_cycles_ran, 8)
         self.assertEqual(self.cpu.register_program_counter.get(), 2)
         self.assertFalse(self.cpu.flags.get_zero_flag())
         self.assertTrue(self.cpu.flags.get_negative_flag())

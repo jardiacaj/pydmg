@@ -9,7 +9,7 @@ class CPU:
     def __init__(self, memory):
         self.memory = memory
 
-        self.total_clock_cycle_count = 0
+        self.total_clock_cycles_ran = 0
 
         self.register_af = Register16bit(contains_flags=True)
         self.register_a, self.flags = self.register_af.eight_bit_registers
@@ -23,16 +23,34 @@ class CPU:
         self.register_program_counter = Register16bit()
 
         self.cb_prefix = False
-        self.instruction_descriptor = None
+        self.loaded_instruction_descriptor = None
         self.bytes_before_immediates = 0
 
+        self.clock_cycles_since_last_instruction = 0
+
+    # Gets called every 4th crystal clock
+    def step(self):
+        logging.warning("This should be called only in unit tests!")
+        self.tick()
+        while self.loaded_instruction_descriptor is not None:
+            self.tick()
+
     def tick(self):
-        try:
+        if self.loaded_instruction_descriptor is None:
             self.load_next_instruction()
-            self.execute_loaded_instruction()
-        except Exception as e:
-            logging.error(self.dump())
-            raise e
+
+        self.total_clock_cycles_ran += 4
+        self.clock_cycles_since_last_instruction += 4
+
+        if self.clock_cycles_since_last_instruction >= \
+                self.loaded_instruction_descriptor[3]:
+            try:
+                self.execute_loaded_instruction()
+                self.loaded_instruction_descriptor = None
+                self.clock_cycles_since_last_instruction = 0
+            except Exception as e:
+                logging.error(self.dump())
+                raise e
 
     def stack_push_byte(self, byte):
         self.register_stack_pointer.add(-1)
@@ -49,16 +67,16 @@ class CPU:
         if next_byte == 0xCB:
             self.cb_prefix = True
             instruction_opcode = self.memory.read(pc + 1)
-            self.instruction_descriptor = cpu_instruction_table.cb_instructions.get(
+            self.loaded_instruction_descriptor = cpu_instruction_table.cb_instructions.get(
                 instruction_opcode)
             self.bytes_before_immediates = 2
         else:
             self.cb_prefix = False
             instruction_opcode = next_byte
-            self.instruction_descriptor = cpu_instruction_table.instructions.get(
+            self.loaded_instruction_descriptor = cpu_instruction_table.instructions.get(
                 instruction_opcode)
             self.bytes_before_immediates = 1
-        if self.instruction_descriptor is None:
+        if self.loaded_instruction_descriptor is None:
             raise NotImplementedError(
                 'Instruction 0x{instruction_opcode:02X} '
                 '({instruction_opcode}) '
@@ -72,7 +90,7 @@ class CPU:
         instruction_name, instruction_mnemonic, \
             instruction_length_in_bytes, instruction_clock_cycles, \
             instruction_flags_changed, instruction_implementation = \
-            self.instruction_descriptor
+            self.loaded_instruction_descriptor
         instruction_bytes = [
             self.memory.read(self.register_program_counter.get() + i)
             for i in range(instruction_length_in_bytes)
@@ -88,14 +106,13 @@ class CPU:
             )
         )
 
-        self.total_clock_cycle_count += instruction_clock_cycles
         self.register_program_counter.add(instruction_length_in_bytes)
 
         instruction_implementation(self, *immediates)
 
     def dump(self):
         return """ # CPU Dump #
-            {cycles} total clock cycles
+            {cycles} total CPU cycles
             AF 0x{af:04X} Z={z} N={n} H={h} C={c}
             BC 0x{bc:04X}
             DE 0x{de:04X}
@@ -106,7 +123,7 @@ class CPU:
             Stack
 {stack_dump}
             """.format(
-                cycles=self.total_clock_cycle_count,
+                cycles=self.total_clock_cycles_ran,
                 af=self.register_af.get(),
                 z=self.flags.get_zero_flag(),
                 n=self.flags.get_negative_flag(),

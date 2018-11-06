@@ -10,7 +10,7 @@ main_menu = [
             {
                 'key': 's',
                 'name': 'Step',
-                'value': 'step'
+                'value': 'cpu_step'
             },
             {
                 'key': 'r',
@@ -66,8 +66,8 @@ class DMGDebugger:
     def run(self):
         while True:
             response = prompt(main_menu)
-            if response['main'] == 'step':
-                self.emulator.step()
+            if response['main'] == 'cpu_step':
+                self.emulator.cpu_step()
 
             elif response['main'] == 'cpu dump':
                 print(self.emulator.cpu.dump())
@@ -80,7 +80,7 @@ class DMGDebugger:
                 if response['address'] != '':
                     run_to = int(response['address'], 16)
                     while self.emulator.cpu.register_program_counter.get() != run_to:
-                        self.emulator.step()
+                        self.emulator.cpu_step()
 
             elif response['main'] == 'quit':
                 break

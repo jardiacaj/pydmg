@@ -1,24 +1,50 @@
 import argparse
 import logging
+import time
 
 from cpu import CPU
 from debugger import DMGDebugger
 from memory import DMGMemory
 
+DMG_CLOCK_FREQUENCY = 4194304
+DMG_SECONDS_PER_CLOCK = 1 / DMG_CLOCK_FREQUENCY
+
 
 class PyDMG:
     def __init__(self, boot_romfile_path, cartridge_romfile_path):
+        self.last_cycle_start_time = 0
+        self.total_clock_cycles_ran = 0
         self.memory = DMGMemory()
         self.memory.load_boot_rom(boot_romfile_path)
         self.memory.load_cartridge_rom(cartridge_romfile_path)
         self.cpu = CPU(self.memory)
 
-    def step(self):
-        self.cpu.tick()
+    def cpu_step(self):
+        self.clock()
+        self.clock()
+        self.clock()
+        self.clock()
+        while self.cpu.loaded_instruction_descriptor is not None:
+            self.clock()
+
+    def clock(self):
+        while self.time_since_last_cycle() < DMG_SECONDS_PER_CLOCK:
+            time_to_sleep = DMG_SECONDS_PER_CLOCK - self.time_since_last_cycle()
+            if time_to_sleep > 0:
+                time.sleep(time_to_sleep)
+        self.last_cycle_start_time = time.monotonic()
+        # First increase, then run as first instruction needs cycles to run
+        self.total_clock_cycles_ran += 1
+        if self.total_clock_cycles_ran % 4 == 0:
+            self.cpu.tick()
+
+    def time_since_last_cycle(self):
+        time_since_last_cycle = time.monotonic() - self.last_cycle_start_time
+        return time_since_last_cycle
 
     def run(self):
         while True:
-            self.step()
+            self.clock()
 
 
 if __name__ == "__main__":

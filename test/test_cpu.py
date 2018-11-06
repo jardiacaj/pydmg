@@ -10,16 +10,16 @@ class DefaultCPUTestCase(unittest.TestCase):
         self.cpu = CPU(self.memory)
 
     def testDefaultCPU(self):
-        self.assertEqual(self.cpu.total_clock_cycle_count, 0)
+        self.assertEqual(self.cpu.total_clock_cycles_ran, 0)
         self.assertEqual(self.cpu.register_af.get(), 0)
         self.assertEqual(self.cpu.register_a.get(), 0)
         self.assertEqual(self.cpu.flags.get_zero_flag(), 0)
 
     def testNOPTick(self):
-        self.cpu.tick()
-        self.assertEqual(self.cpu.total_clock_cycle_count, 4)
+        self.cpu.step()
+        self.assertEqual(self.cpu.total_clock_cycles_ran, 4)
         self.assertEqual(self.cpu.register_program_counter.get(), 1)
 
     def testInvalidInstruction(self):
         self.memory.boot_rom.data[0] = 0xFD
-        self.assertRaises(NotImplementedError, self.cpu.tick)
+        self.assertRaises(NotImplementedError, self.cpu.step)

@@ -11,6 +11,6 @@ class ControlInstructionTestCase(unittest.TestCase):
 
     def testNop(self):
         self.memory.boot_rom.data = [0]
-        self.cpu.tick()
-        self.assertEqual(self.cpu.total_clock_cycle_count, 4)
+        self.cpu.step()
+        self.assertEqual(self.cpu.total_clock_cycles_ran, 4)
         self.assertEqual(self.cpu.register_program_counter.get(), 1)
