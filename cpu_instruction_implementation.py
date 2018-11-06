@@ -130,7 +130,7 @@ def ldh_n_a(cpu, immediate):
 def ldh_a_n(cpu, immediate):
     cpu.register_a.set(
         cpu.memory.read(
-            0xFF0 + immediate
+            0xFF00 + immediate
         )
     )
 

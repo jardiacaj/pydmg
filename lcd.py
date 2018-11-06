@@ -3,13 +3,26 @@ class LCD:
         self.memory = memory
         self.total_clock_cycles_ran = 0
         self.clock_cycles_since_last_hblank_end = 0
+
+        self.enabled = 0
+        self.window_tile_map_display_select = 0
+        self.window_display_enable = 0
+        self.bg_and_window_tile_data_select = 0
+        self.bg_tile_map_display_select = 0
+        self.sprite_size = 0
+        self.sprite_display = 0
+        self.bg_and_window_display = 0
         self.current_line = 0
+        self.background_palette = [0] * 4  # maps 2-bit color numbers to 2-bit color shades
 
     def clock(self):
+        if not self.enabled:
+            return
+
         self.total_clock_cycles_ran += 1
         self.clock_cycles_since_last_hblank_end += 1
 
-        if self.clock_cycles_since_last_hblank_end == (20 + 43 + 51):
+        if self.clock_cycles_since_last_hblank_end == (20 + 43 + 51) * 4:
             self.clock_cycles_since_last_hblank_end = 0
             self.current_line += 1
             if self.current_line == 154:
