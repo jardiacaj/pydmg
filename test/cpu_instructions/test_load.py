@@ -59,20 +59,20 @@ class LoadInstructionTestCase(unittest.TestCase):
 
     def test_LD__C__A(self):
         # We need big memory to make the write
-        self.memory.boot_rom.data = [0xE2] + [0]*65316
+        self.memory.boot_rom.data = [0xE2]
         self.cpu.register_a.set(0x12)
-        self.cpu.register_c.set(0x24)
+        self.cpu.register_c.set(0x84)
         self.cpu.step()
         self.assertEqual(self.cpu.total_clock_cycles_ran, 8)
         self.assertEqual(self.cpu.register_program_counter.get(), 1)
-        self.assertEqual(self.memory.read(0xFF24), 0x12)
+        self.assertEqual(self.memory.read(0xFF84), 0x12)
 
     def test_LD_A__C(self):
         # LD A,(C)
         # We need big memory to make the read
-        self.memory.boot_rom.data = [0xF2] + [0]*65316
-        self.memory.write(0xFF24, 0x33)
-        self.cpu.register_c.set(0x24)
+        self.memory.boot_rom.data = [0xF2]
+        self.memory.write(0xFF84, 0x33)
+        self.cpu.register_c.set(0x84)
         self.cpu.step()
         self.assertEqual(self.cpu.total_clock_cycles_ran, 8)
         self.assertEqual(self.cpu.register_program_counter.get(), 1)
@@ -86,12 +86,13 @@ class LoadInstructionTestCase(unittest.TestCase):
         self.assertEqual(self.cpu.register_c.get(), 0xFE)
 
     def test_LDH_N_A(self):
-        self.memory.boot_rom.data = [0xE0, 0x12] + [0]*65316
+        self.memory.boot_rom.data[0x0000] = 0xE0
+        self.memory.boot_rom.data[0x0001] = 0x92
         self.cpu.register_a.set(0x24)
         self.cpu.step()
         self.assertEqual(self.cpu.total_clock_cycles_ran, 12)
         self.assertEqual(self.cpu.register_program_counter.get(), 2)
-        self.assertEqual(self.memory.read(0xFF12), 0x24)
+        self.assertEqual(self.memory.read(0xFF92), 0x24)
 
     def test_LD_HL_D16(self):
         self.memory.boot_rom.data = [0x21, 0x34, 0x12]

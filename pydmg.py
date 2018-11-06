@@ -4,7 +4,9 @@ import time
 
 from cpu import CPU
 from debugger import DMGDebugger
+from lcd import LCD
 from memory import DMGMemory
+from sound import Sound
 
 DMG_CLOCK_FREQUENCY = 4194304
 DMG_SECONDS_PER_CLOCK = 1 / DMG_CLOCK_FREQUENCY
@@ -14,9 +16,12 @@ class PyDMG:
     def __init__(self, boot_romfile_path, cartridge_romfile_path):
         self.last_cycle_start_time = 0
         self.total_clock_cycles_ran = 0
-        self.memory = DMGMemory()
-        self.memory.load_boot_rom(boot_romfile_path)
-        self.memory.load_cartridge_rom(cartridge_romfile_path)
+        self.lcd = LCD()
+        self.sound = Sound()
+        self.memory = DMGMemory(
+            self.lcd, self.sound, boot_romfile_path, cartridge_romfile_path)
+        self.lcd.memory = self.memory
+        self.sound.memory = self.memory
         self.cpu = CPU(self.memory)
 
     def cpu_step(self):
@@ -35,6 +40,7 @@ class PyDMG:
         self.last_cycle_start_time = time.monotonic()
         # First increase, then run as first instruction needs cycles to run
         self.total_clock_cycles_ran += 1
+        self.lcd.clock()
         if self.total_clock_cycles_ran % 4 == 0:
             self.cpu.tick()
 

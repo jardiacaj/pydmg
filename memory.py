@@ -1,6 +1,7 @@
 import logging
 
 from binreader import bytes_from_file
+from memory_mapped_io import MemoryMappedIO
 
 
 class MemoryFault(Exception):
@@ -58,7 +59,12 @@ class MemoryZone:
 
 
 class DMGMemory:
-    def __init__(self):
+    def __init__(self,
+                 lcd=None,
+                 sound=None,
+                 boot_romfile_path=None,
+                 cartridge_romfile_path=None,
+                 ):
         self.boot_rom = MemoryZone(
             'boot ROM', size=0x0100, base_address=0x0000, is_rom=True)
         self.cartridge_rom = MemoryZone(
@@ -76,11 +82,16 @@ class DMGMemory:
         self.oam_ram = MemoryZone(
             'OAM RAM', size=0xA0, base_address=0xFE00,
             is_implemented=False)
-        self.io_ram = MemoryZone(
+        self.io_ram = MemoryMappedIO(
             'IO RAM', size=0x80, base_address=0xFF00,
-            is_implemented=False)
+            lcd=lcd, sound=sound)
         self.hram = MemoryZone(
             'HRAM', size=0x80, base_address=0xFF80)
+
+        if boot_romfile_path is not None:
+            self.load_boot_rom(boot_romfile_path)
+        if cartridge_romfile_path is not None:
+            self.load_cartridge_rom(cartridge_romfile_path)
 
     def load_boot_rom(self, boot_romfile_path):
         print("Reading boot ROM {}".format(boot_romfile_path))
