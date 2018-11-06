@@ -1,6 +1,6 @@
 import unittest
 
-from memory import DMGMemory, MemoryZone, MemoryFault
+from memory_zone import MemoryZone, MemoryFault
 
 
 class MemoryZoneTestCase(unittest.TestCase):

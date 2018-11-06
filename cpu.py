@@ -1,7 +1,7 @@
 import logging
 
 import cpu_instruction_table
-from memory import MemoryFault
+from memory_zone import MemoryFault
 from register import Register16bit
 
 

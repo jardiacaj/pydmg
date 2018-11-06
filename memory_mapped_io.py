@@ -2,7 +2,8 @@ class IOMemoryFault(Exception):
     pass
 
 
-
+def read_NR52(io):
+    return
 
 class MemoryMappedIO:
     def __init__(self, name, size, base_address, lcd, sound):
@@ -23,7 +24,7 @@ class MemoryMappedIO:
 
     def read(self, address):
         if address == 0xFF26:  # NR 52
-
+            pass
         if address == 0xFF44:  # LCDC Y-Coordinate
             return self.lcd.current_line
         raise NotImplementedError("Read IO address {:04X}".format(address))

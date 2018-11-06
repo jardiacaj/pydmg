@@ -1,61 +1,12 @@
 import logging
 
 from binreader import bytes_from_file
+from memory_cartridge_rom import MemoryZoneCartridgeRom
 from memory_mapped_io import MemoryMappedIO
 
 
-class MemoryFault(Exception):
-    pass
-
-
-class MemoryZone:
-    def __init__(self, name, size, base_address, alt_base_address=None,
-                 is_rom=False, is_implemented=True):
-        self.name = name
-        self.data = [0] * size
-        self.base_address = base_address
-        self.alt_base_address = alt_base_address
-        self.is_rom = is_rom
-        self.is_implemented = is_implemented
-        self.is_enabled = True
-
-    def read(self, address):
-        if not self.is_implemented:
-            logging.error('Memory {} not implmemented'.format(self.name))
-        try:
-            return self.data[address - self.base_address]
-        except IndexError as e:
-            try:
-                if self.alt_base_address is not None:
-                    return self.data[address - self.alt_base_address]
-                else:
-                    raise e
-            except IndexError:
-                raise MemoryFault(
-                    "Tried to read invalid "
-                    "memory address 0x{address:04X} ({address})".format(
-                        address=address
-                    ))
-
-    def write(self, address, value):
-        if not self.is_implemented:
-            logging.error('Memory {} not implmemented'.format(self.name))
-        if self.is_rom:
-            raise MemoryFault("Wrote to ROM address {:04X}".format(address))
-        try:
-            self.data[address - self.base_address] = value % 256
-        except IndexError as e:
-            try:
-                if self.alt_base_address is not None:
-                    self.data[address - self.alt_base_address] = value % 256
-                else:
-                    raise e
-            except IndexError:
-                raise MemoryFault(
-                    "Tried to write 0x{value:02X} ({value}) to invalid "
-                    "memory address 0x{address:04X} ({address})".format(
-                        value=value, address=address
-                    ))
+# CODE: name, supported
+from memory_zone import MemoryZone, MemoryFault
 
 
 class DMGMemory:
@@ -67,7 +18,7 @@ class DMGMemory:
                  ):
         self.boot_rom = MemoryZone(
             'boot ROM', size=0x0100, base_address=0x0000, is_rom=True)
-        self.cartridge_rom = MemoryZone(
+        self.cartridge_rom = MemoryZoneCartridgeRom(
             'cartridge ROM', size=0x8000, base_address=0x0000, is_rom=True)
         self.video_ram = MemoryZone(
             'video RAM', size=0x2000, base_address=0x8000,
@@ -91,42 +42,13 @@ class DMGMemory:
         if boot_romfile_path is not None:
             self.load_boot_rom(boot_romfile_path)
         if cartridge_romfile_path is not None:
-            self.load_cartridge_rom(cartridge_romfile_path)
+            self.cartridge_rom.load_cartridge_rom(cartridge_romfile_path)
 
     def load_boot_rom(self, boot_romfile_path):
         print("Reading boot ROM {}".format(boot_romfile_path))
         for address, rom_byte in enumerate(bytes_from_file(boot_romfile_path)):
             self.boot_rom.data[address] = rom_byte
         logging.debug("Loaded {} boot rom bytes".format(address+1))
-
-    def load_cartridge_rom(self, cartridge_romfile_path):
-        for address, rom_byte in enumerate(
-                bytes_from_file(cartridge_romfile_path)):
-            self.cartridge_rom.data[address] = rom_byte
-        logging.debug("Loaded {} cartridge rom bytes".format(address+1))
-        logging.info(
-            "Cartridge name: {}".format(
-                self.read_cartridge_name()
-            )
-        )
-        if self.cartridge_is_gbc():
-            logging.info("GBC cart")
-        else:
-            logging.info("Non-GBC cart")
-        if self.cartridge_is_sgb():
-            logging.info("SGB cart")
-        else:
-            logging.info("Non-SGB cart")
-
-    def read_cartridge_name(self):
-        return "".join(chr(byte) for byte
-                       in self.cartridge_rom.data[0x0134:0x0142])
-
-    def cartridge_is_gbc(self):
-        return self.cartridge_rom.data[0x143] == 0x80
-
-    def cartridge_is_sgb(self):
-        return self.cartridge_rom.data[0x146] == 0x03
 
     def address_to_memory(self, address):
         if address > 0xFFFF:
