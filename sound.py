@@ -6,8 +6,12 @@ class Voice:
         self.initial_envelope_volume = 0
         self.envelope_up = 0
         self.number_envelope_sweep = 0
+        self.frequency = 0
+        self.initial_bit = 0
+        self.counter_enabled = 0
         self.output_to_so1 = False
         self.output_to_so2 = False
+
 
 class Sound:
     def __init__(self, memory=None):

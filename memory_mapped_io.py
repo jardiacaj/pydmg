@@ -11,7 +11,7 @@ def read_NR11(io):
 
 def write_NR11(io, value):
     io.sound.voices[0].wave_duty = value >> 6
-    io.sound.voices[0].sound_length = value & 0x00111111
+    io.sound.voices[0].sound_length = value & 0b00111111
 
 
 def read_NR12(io):
@@ -25,7 +25,25 @@ def read_NR12(io):
 def write_NR12(io, value):
     io.sound.voices[0].initial_envelope_volume = value >> 4
     io.sound.voices[0].envelope_up = (value & (1 << 3))
-    io.sound.voices[0].number_envelope_sweep = value // 2**4
+    io.sound.voices[0].number_envelope_sweep = value & 0b111
+
+
+def write_NR13(io, value):
+    io.sound.voices[0].frequency &= 0xF0
+    io.sound.voices[0].frequency += value
+
+
+def write_NR14(io, value):
+    io.sound.voices[0].initial_bit = value &  (1 << 7)
+    io.sound.voices[0].counter_enabled = value & (1 << 6)
+    io.sound.voices[0].frequency %= 256
+    io.sound.voices[0].frequency += (value & 0b111) << 8
+
+
+def read_NR14(io):
+    if io.sound.voices[0].counter_enabled:
+        return 1 << 6
+    return 0
 
 
 def read_NR50(io):
@@ -159,6 +177,8 @@ class MemoryMappedIO:
         return {
             0xFF11: ("NR 11 Channel 1 Sound length/Wave pattern duty (R/W)", read_NR11, write_NR11),
             0xFF12: ("NR 12 Channel 1 Volume Envelope (R/W)", read_NR12, write_NR12),
+            0xFF13: ("NR 13 Channel 1 Frequency lo (W)", None, write_NR13),
+            0xFF14: ("NR 14 Channel 1 Frequency hi (R/W)", read_NR14, write_NR14),
             0xFF24: ("NR 50 Channel control / ON-OFF / Volume (R/W)", read_NR50, write_NR50),
             0xFF25: ("NR 51 Selection of Sound output terminal (R/W)", read_NR51, write_NR51),
             0xFF26: ("NR 52 Sound on/off", read_NR52, write_NR52),
@@ -171,7 +191,7 @@ class MemoryMappedIO:
 
     def read(self, address):
         implementation = self.mapping.get(address)
-        if not implementation:
+        if not implementation or not implementation[1]:
             raise NotImplementedError("Read IO address {:04X}".format(address))
         value = implementation[1](self)
         logging.debug("Read I/O address {:04X} value {:02X}".format(address, value))
@@ -179,7 +199,7 @@ class MemoryMappedIO:
 
     def write(self, address, value):
         implementation = self.mapping.get(address)
-        if not implementation:
+        if not implementation or not implementation[2]:
             raise NotImplementedError("Write IO address {:04X}".format(address))
         logging.debug("Write I/O address {:04X} value {:02X}".format(address, value))
         implementation[2](self, value)
