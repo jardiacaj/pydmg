@@ -35,7 +35,7 @@ class DMGMemory:
             is_implemented=False)
         self.io_ram = MemoryMappedIO(
             'IO RAM', size=0x80, base_address=0xFF00,
-            lcd=lcd, sound=sound)
+            lcd=lcd, sound=sound, memory=self)
         self.hram = MemoryZone(
             'HRAM', size=0x80, base_address=0xFF80)
 

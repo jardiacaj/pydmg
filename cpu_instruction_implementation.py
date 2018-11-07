@@ -307,3 +307,46 @@ def compare_immediate_to_a(save_subtract_result_to_A=False):
         if save_subtract_result_to_A:
             cpu.register_a.set(result)
     return instruction
+
+
+def add_register_to_a(register_id):
+    def instruction(cpu):
+        register = get_register(register_id, cpu)
+        result = cpu.register_a.get() + register.get()
+        carry_3 = (cpu.register_a.get() % 16) + (register.get() % 16) > 0x0F
+        cpu.register_a.set(result)
+        cpu.flags.set_all(
+            zero=(result % 256) == 0,
+            negative=False,
+            half_carry=carry_3,
+            carry=result > 255,
+        )
+    return instruction
+
+
+def add_pointer_to_a(register_id):
+    def instruction(cpu):
+        register = get_register(register_id, cpu)
+        value_to_add = cpu.memory.read(register.get())
+        result = cpu.register_a.get() + value_to_add
+        carry_3 = (cpu.register_a.get() % 16) + (value_to_add % 16) > 0x0F
+        cpu.register_a.set(result)
+        cpu.flags.set_all(
+            zero=(result % 256) == 0,
+            negative=False,
+            half_carry=carry_3,
+            carry=result > 255,
+        )
+    return instruction
+
+
+def add_immediate_to_a(cpu, immediate):
+    result = cpu.register_a.get() + immediate
+    carry_3 = (cpu.register_a.get() % 16) + (immediate % 16) > 0x0F
+    cpu.register_a.set(result)
+    cpu.flags.set_all(
+        zero=(result % 256) == 0,
+        negative=False,
+        half_carry=carry_3,
+        carry=result > 255,
+    )

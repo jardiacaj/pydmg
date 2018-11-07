@@ -128,3 +128,55 @@ class ALUInstructionTestCase(unittest.TestCase):
         self.assertFalse(self.cpu.flags.get_half_carry_flag())
         self.assertTrue(self.cpu.flags.get_carry_flag())
         self.assertEqual(self.cpu.register_a.get(), 0xFF)
+
+    def test_ADD_A(self):
+        self.memory.boot_rom.data[0x0000] = 0x87
+        self.cpu.register_a.set(0x7F)
+        self.cpu.step()
+        self.assertEqual(self.cpu.total_clock_cycles_ran, 4)
+        self.assertEqual(self.cpu.register_program_counter.get(), 1)
+        self.assertFalse(self.cpu.flags.get_zero_flag())
+        self.assertFalse(self.cpu.flags.get_negative_flag())
+        self.assertTrue(self.cpu.flags.get_half_carry_flag())
+        self.assertFalse(self.cpu.flags.get_carry_flag())
+        self.assertEqual(self.cpu.register_a.get(), 0xFE)
+
+    def test_ADD_B(self):
+        self.memory.boot_rom.data[0x0000] = 0x80
+        self.cpu.register_a.set(0xFF)
+        self.cpu.register_b.set(0x01)
+        self.cpu.step()
+        self.assertEqual(self.cpu.total_clock_cycles_ran, 4)
+        self.assertEqual(self.cpu.register_program_counter.get(), 1)
+        self.assertTrue(self.cpu.flags.get_zero_flag())
+        self.assertFalse(self.cpu.flags.get_negative_flag())
+        self.assertTrue(self.cpu.flags.get_half_carry_flag())
+        self.assertTrue(self.cpu.flags.get_carry_flag())
+        self.assertEqual(self.cpu.register_a.get(), 0x00)
+
+    def test_ADD_HL(self):
+        self.memory.boot_rom.data[0x0000] = 0x86
+        self.memory.boot_rom.data[0x0001] = 0x00
+        self.memory.boot_rom.data[0x0002] = 0x00
+        self.cpu.register_a.set(0x04)
+        self.cpu.step()
+        self.assertEqual(self.cpu.total_clock_cycles_ran, 8)
+        self.assertEqual(self.cpu.register_program_counter.get(), 1)
+        self.assertFalse(self.cpu.flags.get_zero_flag())
+        self.assertFalse(self.cpu.flags.get_negative_flag())
+        self.assertFalse(self.cpu.flags.get_half_carry_flag())
+        self.assertFalse(self.cpu.flags.get_carry_flag())
+        self.assertEqual(self.cpu.register_a.get(), 0x8A)
+
+    def test_ADD_immediate(self):
+        self.memory.boot_rom.data[0x0000] = 0xC6
+        self.memory.boot_rom.data[0x0001] = 0x80
+        self.cpu.register_a.set(0x7F)
+        self.cpu.step()
+        self.assertEqual(self.cpu.total_clock_cycles_ran, 8)
+        self.assertEqual(self.cpu.register_program_counter.get(), 2)
+        self.assertFalse(self.cpu.flags.get_zero_flag())
+        self.assertFalse(self.cpu.flags.get_negative_flag())
+        self.assertFalse(self.cpu.flags.get_half_carry_flag())
+        self.assertFalse(self.cpu.flags.get_carry_flag())
+        self.assertEqual(self.cpu.register_a.get(), 0xFF)

@@ -163,14 +163,20 @@ def write_LCDC(io, value):
     io.lcd.bg_and_window_display = value & (1 << 0)
 
 
+def disable_boot_rom(io, value):
+    if value != 0x01:
+        raise NotImplementedError("Only 0x01 may be written to the boot ROM IO")
+    io.memory.boot_rom.is_enabled = False
+
 
 class MemoryMappedIO:
-    def __init__(self, name, size, base_address, lcd, sound):
+    def __init__(self, name, size, base_address, lcd, sound, memory):
         self.name = name
         self.base_address = base_address
         self.is_enabled = True
         self.lcd = lcd
         self.sound = sound
+        self.memory = memory
         self.mapping = self.generate_mapping()
 
     def generate_mapping(self):
@@ -187,6 +193,7 @@ class MemoryMappedIO:
             0xFF43: ("SCX Scroll X (R / W)", lambda io: io.lcd.scroll_x, write_SCX),
             0xFF44: ("LCDC Y-Coordinate (current line)", lambda io: io.lcd.current_line, write_LCDC_Y_Coord),
             0xFF47: ("BGP - BG Palette Data (R/W) - Non CGB Mode Only", read_BGP, write_BGP),
+            0xFF50: ("Disable boot ROM", None, disable_boot_rom),
         }
 
     def read(self, address):
@@ -200,6 +207,6 @@ class MemoryMappedIO:
     def write(self, address, value):
         implementation = self.mapping.get(address)
         if not implementation or not implementation[2]:
-            raise NotImplementedError("Write IO address {:04X}".format(address))
+            raise NotImplementedError("Write IO address {:04X} value {:02X}".format(address, value))
         logging.debug("Write I/O address {:04X} value {:02X}".format(address, value))
         implementation[2](self, value)

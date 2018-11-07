@@ -1,3 +1,5 @@
+import logging
+
 from PyInquirer import prompt, Separator
 
 main_menu = [
@@ -16,6 +18,11 @@ main_menu = [
                 'key': 'r',
                 'name': 'Run',
                 'value': 'run'
+            },
+            {
+                'key': 'f',
+                'name': 'Fast run to address',
+                'value': 'fast-run-to'
             },
             {
                 'key': 'a',
@@ -81,6 +88,15 @@ class DMGDebugger:
                     run_to = int(response['address'], 16)
                     while self.emulator.cpu.register_program_counter.get() != run_to:
                         self.emulator.cpu_step()
+
+            elif response['main'] == 'fast-run-to':
+                response = prompt(run_to_input)
+                if response['address'] != '':
+                    run_to = int(response['address'], 16)
+                    logging.getLogger().setLevel(logging.INFO)
+                    while self.emulator.cpu.register_program_counter.get() != run_to:
+                        self.emulator.cpu_step()
+                    logging.getLogger().setLevel(logging.DEBUG)
 
             elif response['main'] == 'quit':
                 break
