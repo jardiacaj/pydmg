@@ -7,7 +7,7 @@ from cpu_instruction_decoder import increment_8bit, increment_16bit, decrement_8
     load_immediate_pointer_to_register, load_16bit_immediate_to_register, \
     load_16bit_register_to_register, load_8bit_immediate_to_register, xor, \
     and_instruction, compare_register, compare_pointer, compare_immediate, \
-    push, pop
+    push, pop, subtract_register, subtract_pointer, subtract_immediate
 from cpu_instruction_decoder_cb import rotate_register_left, rotate_pointer_left, \
     rotate_register_right, rotate_pointer_right, \
     rotate_register_left_through_carry, rotate_pointer_left_through_carry, \
@@ -203,6 +203,16 @@ instructions = {
     0xBD: compare_register(cpu_registers.L),
     0xBE: compare_pointer(cpu_registers.HL),
     0xFE: compare_immediate(),
+
+    0x97: subtract_register(cpu_registers.A),
+    0x90: subtract_register(cpu_registers.B),
+    0x91: subtract_register(cpu_registers.C),
+    0x92: subtract_register(cpu_registers.D),
+    0x93: subtract_register(cpu_registers.E),
+    0x94: subtract_register(cpu_registers.H),
+    0x95: subtract_register(cpu_registers.L),
+    0x96: subtract_pointer(cpu_registers.HL),
+    0xD6: subtract_immediate(),
 
     0xE0: ("Put A into memory address $FF00+n",
            "LDH ($FF00+d8),A", 2, 12, None, cpu_instruction_implementation.ldh_n_a),

@@ -261,7 +261,7 @@ def and_instruction(register_id):
     return instruction
 
 
-def compare_register_to_a(register_id):
+def compare_register_to_a(register_id, save_subtract_result_to_A=False):
     def instruction(cpu):
         register = get_register(register_id, cpu)
         borrowed_bit_4 = (cpu.register_a.get()) % 16 < (register.get() % 16)
@@ -272,10 +272,12 @@ def compare_register_to_a(register_id):
             half_carry=borrowed_bit_4,
             carry=result < 0,
         )
+        if save_subtract_result_to_A:
+            cpu.register_a.set(result)
     return instruction
 
 
-def compare_pointer_to_a(register_id):
+def compare_pointer_to_a(register_id, save_subtract_result_to_A=False):
     def instruction(cpu):
         register = get_register(register_id, cpu)
         pointed_value = cpu.memory.read(register.get())
@@ -287,15 +289,21 @@ def compare_pointer_to_a(register_id):
             half_carry=borrowed_bit_4,
             carry=result < 0,
         )
+        if save_subtract_result_to_A:
+            cpu.register_a.set(result)
     return instruction
 
 
-def compare_immediate_to_a(cpu, immediate):
-    result = cpu.register_a.get() - immediate
-    borrowed_bit_4 = (cpu.register_a.get()) % 16 < (immediate % 16)
-    cpu.flags.set_all(
-        zero=result == 0,
-        negative=True,
-        half_carry=borrowed_bit_4,
-        carry=result < 0,
-    )
+def compare_immediate_to_a(save_subtract_result_to_A=False):
+    def instruction(cpu, immediate):
+        result = cpu.register_a.get() - immediate
+        borrowed_bit_4 = (cpu.register_a.get()) % 16 < (immediate % 16)
+        cpu.flags.set_all(
+            zero=result == 0,
+            negative=True,
+            half_carry=borrowed_bit_4,
+            carry=result < 0,
+        )
+        if save_subtract_result_to_A:
+            cpu.register_a.set(result)
+    return instruction

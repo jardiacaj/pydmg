@@ -171,5 +171,29 @@ def compare_immediate():
     return (
         "Compare A with d8 (like A - n without result)",
         "CP d8", 2, 8, "Z1HC",
-        cpu_instruction_implementation.compare_immediate_to_a
+        cpu_instruction_implementation.compare_immediate_to_a()
+    )
+
+
+def subtract_register(register):
+    return (
+        "Substract {} from A".format(register),
+        "SUB {}".format(register), 1, 4, "Z1HC",
+        cpu_instruction_implementation.compare_register_to_a(register, save_subtract_result_to_A=True)
+    )
+
+
+def subtract_pointer(register):
+    return (
+        "Subtract ({}) from A".format(register),
+        "SUB ({})".format(register), 1, 8, "Z1HC",
+        cpu_instruction_implementation.compare_pointer_to_a(register, save_subtract_result_to_A=True)
+    )
+
+
+def subtract_immediate():
+    return (
+        "Subtract immediate from A",
+        "SUB d8", 2, 8, "Z1HC",
+        cpu_instruction_implementation.compare_immediate_to_a(save_subtract_result_to_A=True)
     )
