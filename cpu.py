@@ -97,14 +97,15 @@ class CPU:
         ]
         immediates = instruction_bytes[self.bytes_before_immediates:]
 
-        logging.debug(
-            "PC {:02X}: {:12} -- {}".format(
-                self.register_program_counter.get(),
-                " ".join(["{:02X}".format(byte) for byte in instruction_bytes]),
-                instruction_mnemonic,
-                " imm:  if instruction_bytes",
+        if logging.getLogger().isEnabledFor(logging.DEBUG):
+            logging.debug(
+                "PC {:02X}: {:12} -- {}".format(
+                    self.register_program_counter.get(),
+                    " ".join(["{:02X}".format(byte) for byte in instruction_bytes]),
+                    instruction_mnemonic,
+                    " imm:  if instruction_bytes",
+                )
             )
-        )
 
         self.register_program_counter.add(instruction_length_in_bytes)
 

@@ -13,9 +13,10 @@ DMG_SECONDS_PER_CLOCK = 1 / DMG_CLOCK_FREQUENCY
 
 
 class PyDMG:
-    def __init__(self, boot_romfile_path, cartridge_romfile_path):
+    def __init__(self, boot_romfile_path = None, cartridge_romfile_path = None, clocked = True):
         self.last_cycle_start_time = 0
         self.total_clock_cycles_ran = 0
+        self.clocked = clocked
         self.lcd = LCD()
         self.sound = Sound()
         self.memory = DMGMemory(
@@ -34,10 +35,11 @@ class PyDMG:
             self.clock()
 
     def clock(self):
-        while self.time_since_last_cycle() < DMG_SECONDS_PER_CLOCK:
-            time_to_sleep = DMG_SECONDS_PER_CLOCK - self.time_since_last_cycle()
-            if time_to_sleep > 0:
-                time.sleep(time_to_sleep)
+        if self.clocked:
+            while self.time_since_last_cycle() < DMG_SECONDS_PER_CLOCK:
+                time_to_sleep = DMG_SECONDS_PER_CLOCK - self.time_since_last_cycle()
+                if time_to_sleep > 0:
+                    time.sleep(time_to_sleep)
         self.last_cycle_start_time = time.monotonic()
         # First increase, then run as first instruction needs cycles to run
         self.total_clock_cycles_ran += 1
@@ -69,6 +71,7 @@ if __name__ == "__main__":
                             logging._levelToName[logging.ERROR],
                             logging._levelToName[logging.CRITICAL],
                         ))
+    parser.add_argument("--disable-clock", action='store_true')
     parser.add_argument("--debugger", action='store_true')
     args = parser.parse_args()
 
@@ -77,7 +80,8 @@ if __name__ == "__main__":
 
     emulator = PyDMG(
         boot_romfile_path=args.boot_romfile,
-        cartridge_romfile_path=args.cartridge_romfile
+        cartridge_romfile_path=args.cartridge_romfile,
+        clocked=not args.disable_clock,
     )
 
     if not args.debugger:

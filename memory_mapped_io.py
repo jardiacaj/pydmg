@@ -135,14 +135,14 @@ def read_LCDC(io):
 
 
 def write_LCDC(io, value):
-    io.lcd.enabled = value | (1 << 7)
-    io.lcd.window_tile_map_display_select = value | (1 << 6)
-    io.lcd.window_display_enable = value | (1 << 5)
-    io.lcd.bg_and_window_tile_data_select = value | (1 << 4)
-    io.lcd.bg_tile_map_display_select = value | (1 << 3)
-    io.lcd.sprite_size = value | (1 << 2)
-    io.lcd.sprite_display = value | (1 << 1)
-    io.lcd.bg_and_window_display = value | (1 << 0)
+    io.lcd.enabled = value & (1 << 7)
+    io.lcd.window_tile_map_display_select = value & (1 << 6)
+    io.lcd.window_display_enable = value & (1 << 5)
+    io.lcd.bg_and_window_tile_data_select = value & (1 << 4)
+    io.lcd.bg_tile_map_display_select = value & (1 << 3)
+    io.lcd.sprite_size = value & (1 << 2)
+    io.lcd.sprite_display = value & (1 << 1)
+    io.lcd.bg_and_window_display = value & (1 << 0)
 
 
 
@@ -171,13 +171,15 @@ class MemoryMappedIO:
 
     def read(self, address):
         implementation = self.mapping.get(address)
-        logging.debug("Read I/O address {:04X}".format(address))
         if not implementation:
             raise NotImplementedError("Read IO address {:04X}".format(address))
-        return implementation[1](self)
+        value = implementation[1](self)
+        logging.debug("Read I/O address {:04X} value {:02X}".format(address, value))
+        return value
 
     def write(self, address, value):
         implementation = self.mapping.get(address)
         if not implementation:
             raise NotImplementedError("Write IO address {:04X}".format(address))
+        logging.debug("Write I/O address {:04X} value {:02X}".format(address, value))
         implementation[2](self, value)

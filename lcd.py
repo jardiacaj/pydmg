@@ -5,6 +5,8 @@ class LCD:
         self.clock_cycles_since_last_hblank_end = 0
 
         self.enabled = 0
+        self.scroll_x = 0
+        self.scroll_y = 0
         self.window_tile_map_display_select = 0
         self.window_display_enable = 0
         self.bg_and_window_tile_data_select = 0
