@@ -1,6 +1,5 @@
 # Resources
 
-
 Boot ROM disassemlby
 https://gist.github.com/drhelius/6063288
 
@@ -19,5 +18,14 @@ http://bgb.bircd.org/pandocs.htm
 RealBoy
 https://realboyemulator.wordpress.com/
 
+Game Boy Development Wiki
+http://gbdev.gg8.se/wiki/articles/Main_Page
+
+Game Boy Developers Kit
+http://gbdk.sourceforge.net/
+
+
 ## Similar projects
+
 https://github.com/Baekalfen/PyBoy
+
