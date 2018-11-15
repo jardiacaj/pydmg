@@ -15,8 +15,14 @@ for input_byte_1 in range(256):
     color_map.append([])
     for input_byte_2 in range(256):
         tmp_color_list = []
-        for color_output in range(8):
-            code_color = (input_byte_1 >> 7 << 1) + (input_byte_2 >> 7)
+        byte_1_copy = input_byte_1
+        byte_2_copy = input_byte_2
+        for dot_in_line in range(8):
+            bit_from_byte_1 = byte_1_copy % 2
+            bit_from_byte_2 = byte_2_copy % 2
+            code_color = (bit_from_byte_1 * 2) + bit_from_byte_2
+            byte_1_copy >>= 1
+            byte_2_copy >>= 1
             tmp_color_list.append(color_code_to_gl_color[code_color])
         color_map[input_byte_1].append([item for sublist in tmp_color_list for item in sublist])
 
@@ -53,22 +59,22 @@ class LCD:
             glClear(GL_COLOR_BUFFER_BIT)
             glLoadIdentity()
             glLineWidth(4)
-            for tile_idx in range(256):
+            for tile_idx in range(16):
                 self.draw_tile(tile_idx)
 
     def draw_tile(self, tile_idx):
         tile_base_address = tile_idx * 16 + 0x8000
-        x_offset = (tile_idx % 8) * 8 * TILE_ZOOM
+        x_offset = (tile_idx % 16) * 8 * TILE_ZOOM
         for tile_line_number in range(8):
             line_base_address = tile_base_address + tile_line_number * 2
             color_byte_1 = self.memory.read(line_base_address)
             color_byte_2 = self.memory.read(line_base_address + 1)
             line_output_colors = color_map[color_byte_1][color_byte_2]
 
-            y_offset = ((tile_idx // 8 + 1) * 8 - tile_line_number) * TILE_ZOOM
+            y_offset = ((tile_idx // 16 + 1) * 8 - tile_line_number) * TILE_ZOOM
 
             pyglet.graphics.draw(
-                8, pyglet.gl.GL_LINES,
+                8, pyglet.gl.GL_POINTS,
                 ('v2i', (
                     x_offset + TILE_ZOOM * 0, y_offset,
                     x_offset + TILE_ZOOM * 1, y_offset,
