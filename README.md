@@ -1,3 +1,14 @@
+# pydmg
+
+This project is work in progress, not much to say for now.
+
+Use pypy for performance.
+
+```
+virtualenv3 -p /usr/bin/pypy3 pypy
+pypy/bin/pypy pydmg.py --help
+```
+
 # Resources
 
 Boot ROM disassemlby
