@@ -1,4 +1,4 @@
 pytest
 PyInquirer
-pysdl2
 numpy
+pygame
