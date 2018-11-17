@@ -61,11 +61,6 @@ class LCDRenderer:
     def render_tile_view(self):
         screenarray = np.full(shape=self.tile_window_size,
                               fill_value=2 ** 32 - 1)
-        for i in range(self.tiles_per_row_in_tile_window):
-            draw_vertical_line(screenarray, i*9, self.tile_window_size[1], 0)
-        for i in range(math.ceil(192 / self.tiles_per_row_in_tile_window)):
-            draw_horizontal_line(screenarray, i*9, self.tile_window_size[0], 0)
-
         for tile_idx in range(192):
             tile_base_address = tile_idx * 16 + 0x8000
             x_offset = (tile_idx % self.tiles_per_row_in_tile_window) * 9
@@ -76,7 +71,12 @@ class LCDRenderer:
                 color_byte_2 = self.lcd.memory.read(line_base_address + 1)
                 line_output_colors = color_map[color_byte_1][color_byte_2]
                 for i in range(len(line_output_colors)):
-                    screenarray[x_offset+i][y_offset] = line_output_colors[i]
+                    screenarray[x_offset+i][y_offset] = line_output_colors[7-i]
+
+        for i in range(1, self.tiles_per_row_in_tile_window):
+            draw_vertical_line(screenarray, i*9-1, self.tile_window_size[1], 255)
+        for i in range(1, math.ceil(192 / self.tiles_per_row_in_tile_window)):
+            draw_horizontal_line(screenarray, i*9-1, self.tile_window_size[0], 255)
 
 
         pygame.surfarray.blit_array(self.screen, screenarray)
