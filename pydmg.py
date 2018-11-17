@@ -5,6 +5,7 @@ import time
 from cpu import CPU
 from debugger import DMGDebugger
 from lcd import LCD
+from lcd_renderer import LCDRenderer
 from memory import DMGMemory
 from sound import Sound
 
@@ -13,11 +14,14 @@ DMG_SECONDS_PER_CLOCK = 1 / DMG_CLOCK_FREQUENCY
 
 
 class PyDMG:
-    def __init__(self, boot_romfile_path = None, cartridge_romfile_path = None, clocked = True):
+    def __init__(self, boot_romfile_path=None, cartridge_romfile_path=None, clocked=True, renderer=False):
         self.last_cycle_start_time = 0
         self.total_clock_cycles_ran = 0
         self.clocked = clocked
         self.lcd = LCD()
+        if renderer:
+            self.renderer = LCDRenderer(self.lcd)
+            self.lcd.renderer = self.renderer
         self.sound = Sound()
         self.memory = DMGMemory(
             self.lcd, self.sound, boot_romfile_path, cartridge_romfile_path)
@@ -82,6 +86,7 @@ if __name__ == "__main__":
         boot_romfile_path=args.boot_romfile,
         cartridge_romfile_path=args.cartridge_romfile,
         clocked=not args.disable_clock,
+        renderer=True,
     )
 
     if not args.debugger:
