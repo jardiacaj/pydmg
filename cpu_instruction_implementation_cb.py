@@ -6,11 +6,11 @@ def register_bit_test(register_id, bit):
         register = get_register(register_id, cpu)
         register_value = register.get()
         if register_value & (1 << bit):
-            cpu.flags.reset_zero_flag()
+            cpu.flags.reset_flag('Z')
         else:
-            cpu.flags.set_zero_flag()
-        cpu.flags.reset_negative_flag()
-        cpu.flags.set_half_carry_flag()
+            cpu.flags.set_flag('Z')
+        cpu.flags.reset_flag('N')
+        cpu.flags.set_flag('H')
     return instruction
 
 
@@ -19,11 +19,11 @@ def pointer_bit_test(register_id, bit):
         register = get_register(register_id, cpu)
         value = cpu.memory.read(register.get())
         if value & (1 << bit):
-            cpu.flags.reset_zero_flag()
+            cpu.flags.reset_flag('Z')
         else:
-            cpu.flags.set_zero_flag()
-        cpu.flags.reset_negative_flag()
-        cpu.flags.set_half_carry_flag()
+            cpu.flags.set_flag('Z')
+        cpu.flags.reset_flag('N')
+        cpu.flags.set_flag('H')
     return instruction
 
 
@@ -33,7 +33,7 @@ def rotate_8bit_register_left(register_id, through_carry):
         value = register.get()
         carry = (value & 0b10000000)
         value = (value << 1) % 256
-        if through_carry and cpu.flags.get_carry_flag():
+        if through_carry and cpu.flags.get_flag('C'):
             value += 1
         if not through_carry and carry:
             value += 1
@@ -53,7 +53,7 @@ def rotate_pointer_left(register_id, through_carry):
         value = cpu.memory.read(register.get())
         carry = (value & 0b10000000)
         value = (value << 1) % 256
-        if through_carry and cpu.flags.get_carry_flag():
+        if through_carry and cpu.flags.get_flag('C'):
             value += 1
         if not through_carry and carry:
             value += 1
@@ -73,7 +73,7 @@ def rotate_8bit_register_right(register_id, through_carry):
         value = register.get()
         carry = value % 2
         value = value >> 1
-        if through_carry and cpu.flags.get_carry_flag():
+        if through_carry and cpu.flags.get_flag('C'):
             value += 128
         if not through_carry and carry:
             value += 128
@@ -93,7 +93,7 @@ def rotate_pointer_right(register_id, through_carry):
         value = cpu.memory.read(register.get())
         carry = value % 2
         value = value >> 1
-        if through_carry and cpu.flags.get_carry_flag():
+        if through_carry and cpu.flags.get_flag('C'):
             value += 128
         if not through_carry and carry:
             value += 128

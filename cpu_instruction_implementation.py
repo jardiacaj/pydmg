@@ -140,9 +140,9 @@ def increment_8bit_register(register_id):
         register = get_register(register_id, cpu)
         register.add(1)
         carry_from_bit_3 = (register.get() & 0b1111) == 0b0000
-        cpu.flags.write_half_carry_flag(carry_from_bit_3)
-        cpu.flags.write_zero_flag(register.get() == 0x00)
-        cpu.flags.reset_negative_flag()
+        cpu.flags.write_flag('H', carry_from_bit_3)
+        cpu.flags.write_flag('Z', register.get() == 0x00)
+        cpu.flags.reset_flag('N')
     return instruction
 
 
@@ -151,9 +151,9 @@ def decrement_8bit_register(register_id):
         register = get_register(register_id, cpu)
         register.add(-1)
         borrowed_bit_4 = (register.get() & 0b1111) == 0b1111
-        cpu.flags.write_half_carry_flag(not borrowed_bit_4)
-        cpu.flags.write_zero_flag(register.get() == 0x00)
-        cpu.flags.set_negative_flag()
+        cpu.flags.write_flag('H', not borrowed_bit_4)
+        cpu.flags.write_flag('Z', register.get() == 0x00)
+        cpu.flags.set_flag('N')
     return instruction
 
 
@@ -176,22 +176,22 @@ def relative_jump(cpu, immediate):
 
 
 def relative_jump_if_not_zero(cpu, immediate):
-    if not cpu.flags.get_zero_flag():
+    if not cpu.flags.get_flag('Z'):
         cpu.register_program_counter.add(twos_complement(immediate, 8))
 
 
 def relative_jump_if_zero(cpu, immediate):
-    if cpu.flags.get_zero_flag():
+    if cpu.flags.get_flag('Z'):
         cpu.register_program_counter.add(twos_complement(immediate, 8))
 
 
 def relative_jump_if_not_carry(cpu, immediate):
-    if not cpu.flags.get_carry_flag():
+    if not cpu.flags.get_flag('C'):
         cpu.register_program_counter.add(twos_complement(immediate, 8))
 
 
 def relative_jump_if_carry(cpu, immediate):
-    if cpu.flags.get_carry_flag():
+    if cpu.flags.get_flag('C'):
         cpu.register_program_counter.add(twos_complement(immediate, 8))
 
 

@@ -25,20 +25,20 @@ class ALUInstructionTestCase(unittest.TestCase):
         self.assertEqual(self.cpu.total_clock_cycles_ran, 4)
         self.assertEqual(self.cpu.register_program_counter.get(), 1)
         self.assertEqual(self.cpu.register_a.get(), 0b10000)
-        self.assertFalse(self.cpu.flags.get_zero_flag())
-        self.assertFalse(self.cpu.flags.get_negative_flag())
-        self.assertTrue(self.cpu.flags.get_half_carry_flag())
-        self.assertFalse(self.cpu.flags.get_carry_flag())
+        self.assertFalse(self.cpu.flags.get_flag('Z'))
+        self.assertFalse(self.cpu.flags.get_flag('N'))
+        self.assertTrue(self.cpu.flags.get_flag('H'))
+        self.assertFalse(self.cpu.flags.get_flag('C'))
 
     def test_CP_A(self):
         self.memory.boot_rom.data[0x0000] = 0xBF
         self.cpu.step()
         self.assertEqual(self.cpu.total_clock_cycles_ran, 4)
         self.assertEqual(self.cpu.register_program_counter.get(), 1)
-        self.assertTrue(self.cpu.flags.get_zero_flag())
-        self.assertTrue(self.cpu.flags.get_negative_flag())
-        self.assertFalse(self.cpu.flags.get_half_carry_flag())
-        self.assertFalse(self.cpu.flags.get_carry_flag())
+        self.assertTrue(self.cpu.flags.get_flag('Z'))
+        self.assertTrue(self.cpu.flags.get_flag('N'))
+        self.assertFalse(self.cpu.flags.get_flag('H'))
+        self.assertFalse(self.cpu.flags.get_flag('C'))
 
     def test_CP_B(self):
         self.memory.boot_rom.data[0x0000] = 0xB8
@@ -47,10 +47,10 @@ class ALUInstructionTestCase(unittest.TestCase):
         self.cpu.step()
         self.assertEqual(self.cpu.total_clock_cycles_ran, 4)
         self.assertEqual(self.cpu.register_program_counter.get(), 1)
-        self.assertFalse(self.cpu.flags.get_zero_flag())
-        self.assertTrue(self.cpu.flags.get_negative_flag())
-        self.assertFalse(self.cpu.flags.get_half_carry_flag())
-        self.assertFalse(self.cpu.flags.get_carry_flag())
+        self.assertFalse(self.cpu.flags.get_flag('Z'))
+        self.assertTrue(self.cpu.flags.get_flag('N'))
+        self.assertFalse(self.cpu.flags.get_flag('H'))
+        self.assertFalse(self.cpu.flags.get_flag('C'))
 
     def test_CP_pointer(self):
         self.memory.boot_rom.data[0x0000] = 0xBE
@@ -60,10 +60,10 @@ class ALUInstructionTestCase(unittest.TestCase):
         self.cpu.step()
         self.assertEqual(self.cpu.total_clock_cycles_ran, 8)
         self.assertEqual(self.cpu.register_program_counter.get(), 1)
-        self.assertFalse(self.cpu.flags.get_zero_flag())
-        self.assertTrue(self.cpu.flags.get_negative_flag())
-        self.assertTrue(self.cpu.flags.get_half_carry_flag())
-        self.assertTrue(self.cpu.flags.get_carry_flag())
+        self.assertFalse(self.cpu.flags.get_flag('Z'))
+        self.assertTrue(self.cpu.flags.get_flag('N'))
+        self.assertTrue(self.cpu.flags.get_flag('H'))
+        self.assertTrue(self.cpu.flags.get_flag('C'))
 
     def test_CP_immediate(self):
         self.memory.boot_rom.data[0x0000] = 0xFE
@@ -72,10 +72,10 @@ class ALUInstructionTestCase(unittest.TestCase):
         self.cpu.step()
         self.assertEqual(self.cpu.total_clock_cycles_ran, 8)
         self.assertEqual(self.cpu.register_program_counter.get(), 2)
-        self.assertFalse(self.cpu.flags.get_zero_flag())
-        self.assertTrue(self.cpu.flags.get_negative_flag())
-        self.assertFalse(self.cpu.flags.get_half_carry_flag())
-        self.assertTrue(self.cpu.flags.get_carry_flag())
+        self.assertFalse(self.cpu.flags.get_flag('Z'))
+        self.assertTrue(self.cpu.flags.get_flag('N'))
+        self.assertFalse(self.cpu.flags.get_flag('H'))
+        self.assertTrue(self.cpu.flags.get_flag('C'))
 
     def test_SUB_A(self):
         self.memory.boot_rom.data[0x0000] = 0x97
@@ -83,10 +83,10 @@ class ALUInstructionTestCase(unittest.TestCase):
         self.cpu.step()
         self.assertEqual(self.cpu.total_clock_cycles_ran, 4)
         self.assertEqual(self.cpu.register_program_counter.get(), 1)
-        self.assertTrue(self.cpu.flags.get_zero_flag())
-        self.assertTrue(self.cpu.flags.get_negative_flag())
-        self.assertFalse(self.cpu.flags.get_half_carry_flag())
-        self.assertFalse(self.cpu.flags.get_carry_flag())
+        self.assertTrue(self.cpu.flags.get_flag('Z'))
+        self.assertTrue(self.cpu.flags.get_flag('N'))
+        self.assertFalse(self.cpu.flags.get_flag('H'))
+        self.assertFalse(self.cpu.flags.get_flag('C'))
         self.assertEqual(self.cpu.register_a.get(), 0x00)
 
     def test_SUB_B(self):
@@ -96,10 +96,10 @@ class ALUInstructionTestCase(unittest.TestCase):
         self.cpu.step()
         self.assertEqual(self.cpu.total_clock_cycles_ran, 4)
         self.assertEqual(self.cpu.register_program_counter.get(), 1)
-        self.assertFalse(self.cpu.flags.get_zero_flag())
-        self.assertTrue(self.cpu.flags.get_negative_flag())
-        self.assertFalse(self.cpu.flags.get_half_carry_flag())
-        self.assertFalse(self.cpu.flags.get_carry_flag())
+        self.assertFalse(self.cpu.flags.get_flag('Z'))
+        self.assertTrue(self.cpu.flags.get_flag('N'))
+        self.assertFalse(self.cpu.flags.get_flag('H'))
+        self.assertFalse(self.cpu.flags.get_flag('C'))
         self.assertEqual(self.cpu.register_a.get(), 0xFE)
 
     def test_SUB_HL(self):
@@ -110,10 +110,10 @@ class ALUInstructionTestCase(unittest.TestCase):
         self.cpu.step()
         self.assertEqual(self.cpu.total_clock_cycles_ran, 8)
         self.assertEqual(self.cpu.register_program_counter.get(), 1)
-        self.assertFalse(self.cpu.flags.get_zero_flag())
-        self.assertTrue(self.cpu.flags.get_negative_flag())
-        self.assertFalse(self.cpu.flags.get_half_carry_flag())
-        self.assertFalse(self.cpu.flags.get_carry_flag())
+        self.assertFalse(self.cpu.flags.get_flag('Z'))
+        self.assertTrue(self.cpu.flags.get_flag('N'))
+        self.assertFalse(self.cpu.flags.get_flag('H'))
+        self.assertFalse(self.cpu.flags.get_flag('C'))
         self.assertEqual(self.cpu.register_a.get(), 0x01)
 
     def test_SUB_immediate(self):
@@ -123,10 +123,10 @@ class ALUInstructionTestCase(unittest.TestCase):
         self.cpu.step()
         self.assertEqual(self.cpu.total_clock_cycles_ran, 8)
         self.assertEqual(self.cpu.register_program_counter.get(), 2)
-        self.assertFalse(self.cpu.flags.get_zero_flag())
-        self.assertTrue(self.cpu.flags.get_negative_flag())
-        self.assertFalse(self.cpu.flags.get_half_carry_flag())
-        self.assertTrue(self.cpu.flags.get_carry_flag())
+        self.assertFalse(self.cpu.flags.get_flag('Z'))
+        self.assertTrue(self.cpu.flags.get_flag('N'))
+        self.assertFalse(self.cpu.flags.get_flag('H'))
+        self.assertTrue(self.cpu.flags.get_flag('C'))
         self.assertEqual(self.cpu.register_a.get(), 0xFF)
 
     def test_ADD_A(self):
@@ -135,10 +135,10 @@ class ALUInstructionTestCase(unittest.TestCase):
         self.cpu.step()
         self.assertEqual(self.cpu.total_clock_cycles_ran, 4)
         self.assertEqual(self.cpu.register_program_counter.get(), 1)
-        self.assertFalse(self.cpu.flags.get_zero_flag())
-        self.assertFalse(self.cpu.flags.get_negative_flag())
-        self.assertTrue(self.cpu.flags.get_half_carry_flag())
-        self.assertFalse(self.cpu.flags.get_carry_flag())
+        self.assertFalse(self.cpu.flags.get_flag('Z'))
+        self.assertFalse(self.cpu.flags.get_flag('N'))
+        self.assertTrue(self.cpu.flags.get_flag('H'))
+        self.assertFalse(self.cpu.flags.get_flag('C'))
         self.assertEqual(self.cpu.register_a.get(), 0xFE)
 
     def test_ADD_B(self):
@@ -148,10 +148,10 @@ class ALUInstructionTestCase(unittest.TestCase):
         self.cpu.step()
         self.assertEqual(self.cpu.total_clock_cycles_ran, 4)
         self.assertEqual(self.cpu.register_program_counter.get(), 1)
-        self.assertTrue(self.cpu.flags.get_zero_flag())
-        self.assertFalse(self.cpu.flags.get_negative_flag())
-        self.assertTrue(self.cpu.flags.get_half_carry_flag())
-        self.assertTrue(self.cpu.flags.get_carry_flag())
+        self.assertTrue(self.cpu.flags.get_flag('Z'))
+        self.assertFalse(self.cpu.flags.get_flag('N'))
+        self.assertTrue(self.cpu.flags.get_flag('H'))
+        self.assertTrue(self.cpu.flags.get_flag('C'))
         self.assertEqual(self.cpu.register_a.get(), 0x00)
 
     def test_ADD_HL(self):
@@ -162,10 +162,10 @@ class ALUInstructionTestCase(unittest.TestCase):
         self.cpu.step()
         self.assertEqual(self.cpu.total_clock_cycles_ran, 8)
         self.assertEqual(self.cpu.register_program_counter.get(), 1)
-        self.assertFalse(self.cpu.flags.get_zero_flag())
-        self.assertFalse(self.cpu.flags.get_negative_flag())
-        self.assertFalse(self.cpu.flags.get_half_carry_flag())
-        self.assertFalse(self.cpu.flags.get_carry_flag())
+        self.assertFalse(self.cpu.flags.get_flag('Z'))
+        self.assertFalse(self.cpu.flags.get_flag('N'))
+        self.assertFalse(self.cpu.flags.get_flag('H'))
+        self.assertFalse(self.cpu.flags.get_flag('C'))
         self.assertEqual(self.cpu.register_a.get(), 0x8A)
 
     def test_ADD_immediate(self):
@@ -175,8 +175,8 @@ class ALUInstructionTestCase(unittest.TestCase):
         self.cpu.step()
         self.assertEqual(self.cpu.total_clock_cycles_ran, 8)
         self.assertEqual(self.cpu.register_program_counter.get(), 2)
-        self.assertFalse(self.cpu.flags.get_zero_flag())
-        self.assertFalse(self.cpu.flags.get_negative_flag())
-        self.assertFalse(self.cpu.flags.get_half_carry_flag())
-        self.assertFalse(self.cpu.flags.get_carry_flag())
+        self.assertFalse(self.cpu.flags.get_flag('Z'))
+        self.assertFalse(self.cpu.flags.get_flag('N'))
+        self.assertFalse(self.cpu.flags.get_flag('H'))
+        self.assertFalse(self.cpu.flags.get_flag('C'))
         self.assertEqual(self.cpu.register_a.get(), 0xFF)

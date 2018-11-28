@@ -2,6 +2,7 @@ import unittest
 
 from cpu import CPU
 from memory import DMGMemory
+from register import Z
 
 
 class DefaultCPUTestCase(unittest.TestCase):
@@ -13,7 +14,7 @@ class DefaultCPUTestCase(unittest.TestCase):
         self.assertEqual(self.cpu.total_clock_cycles_ran, 0)
         self.assertEqual(self.cpu.register_af.get(), 0)
         self.assertEqual(self.cpu.register_a.get(), 0)
-        self.assertEqual(self.cpu.flags.get_zero_flag(), 0)
+        self.assertEqual(self.cpu.flags.get_flag(Z), 0)
 
     def testNOPTick(self):
         self.cpu.step()

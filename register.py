@@ -1,3 +1,16 @@
+Z = 'Z'
+N = 'N'
+H = 'H'
+C = 'C'
+
+FLAG_TO_INDEX = {
+    Z: 7,
+    N: 6,
+    H: 5,
+    C: 4,
+}
+
+
 class Register8bit:
     # combined_register is the 16-bit register that contains this 8-bit one
     def __init__(self, combined_register, is_lower):
@@ -36,65 +49,20 @@ class FlagRegister(Register8bit):
             (1 << 4 if carry else 0)
         )
 
-    def set_zero_flag(self):
-        self.combined_register.data |= 1 << 7
+    def set_flag(self, flag_name):
+        self.combined_register.data |= 1 << FLAG_TO_INDEX[flag_name]
 
-    def reset_zero_flag(self):
-        self.combined_register.data &= (2**16 - 1) - (1 << 7)
+    def reset_flag(self, flag_name):
+        self.combined_register.data &= (2**16 - 1) - (1 << FLAG_TO_INDEX[flag_name])
 
-    def get_zero_flag(self):
-        return self.combined_register.data & (1 << 7)
+    def get_flag(self, flag_name):
+        return self.combined_register.data & (1 << FLAG_TO_INDEX[flag_name])
 
-    def write_zero_flag(self, value):
+    def write_flag(self, flag_name, value):
         if value:
-            self.set_zero_flag()
+            self.set_flag(flag_name)
         else:
-            self.reset_zero_flag()
-
-    def set_negative_flag(self):
-        self.combined_register.data |= 1 << 6
-
-    def reset_negative_flag(self):
-        self.combined_register.data &= (2**16 - 1) - (1 << 6)
-
-    def get_negative_flag(self):
-        return self.combined_register.data & (1 << 6)
-
-    def write_negative_flag(self, value):
-        if value:
-            self.set_negative_flag()
-        else:
-            self.reset_negative_flag()
-
-    def set_half_carry_flag(self):
-        self.combined_register.data |= 1 << 5
-
-    def reset_half_carry_flag(self):
-        self.combined_register.data &= (2**16 - 1) - (1 << 5)
-
-    def get_half_carry_flag(self):
-        return self.combined_register.data & (1 << 5)
-
-    def write_half_carry_flag(self, value):
-        if value:
-            self.set_half_carry_flag()
-        else:
-            self.reset_half_carry_flag()
-
-    def set_carry_flag(self):
-        self.combined_register.data |= 1 << 4
-
-    def reset_carry_flag(self):
-        self.combined_register.data &= (2**16 - 1) - (1 << 4)
-
-    def get_carry_flag(self):
-        return self.combined_register.data & (1 << 4)
-
-    def write_carry_flag(self, value):
-        if value:
-            self.set_carry_flag()
-        else:
-            self.reset_carry_flag()
+            self.reset_flag(flag_name)
 
 
 class Register16bit:

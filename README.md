@@ -2,10 +2,12 @@
 
 This project is work in progress, not much to say for now.
 
-Use pypy for performance.
+Use pypy for performance. Make sure SDL is installed.
 
 ```
+pacman -S sdl sdl_ttf sdl_gfx sdl_mixer sdl_image sdl_sound portmidi
 virtualenv3 -p /usr/bin/pypy3 pypy
+pip install -r requirements.txt
 pypy/bin/pypy pydmg.py --help
 ```
 
