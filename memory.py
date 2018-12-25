@@ -6,6 +6,7 @@ from memory_mapped_io import MemoryMappedIO
 
 
 # CODE: name, supported
+from memory_video_ram import MemoryZoneVRAM
 from memory_zone import MemoryZone, MemoryFault
 
 BOOT_ROM_SIZE = 0x100
@@ -22,14 +23,13 @@ class DMGMemory:
             'boot ROM', size=BOOT_ROM_SIZE, base_address=0x0000, is_rom=True)
         self.cartridge_rom = MemoryZoneCartridgeRom(
             'cartridge ROM', size=0x8000, base_address=0x0000, is_rom=True)
-        self.video_ram = MemoryZone(
+        self.video_ram = MemoryZoneVRAM(
             'video RAM', size=0x2000, base_address=0x8000)
         self.external_ram = MemoryZone(
             'external RAM', size=0x2000, base_address=0xA000,
             is_implemented=False)
         self.internal_ram = MemoryZone(
             'internal RAM', size=0x2000, base_address=0xC000,
-            is_implemented=False,
             alt_base_address=0xE000)
         self.oam_ram = MemoryZone(
             'OAM RAM', size=0xA0, base_address=0xFE00,
