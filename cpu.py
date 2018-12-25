@@ -7,6 +7,7 @@ from register import Register16bit
 
 class CPU:
     def __init__(self, memory):
+        self.logger = logging.getLogger()  # Save reference for better performance
         self.memory = memory
 
         self.total_clock_cycles_ran = 0
@@ -97,7 +98,7 @@ class CPU:
         ]
         immediates = instruction_bytes[self.bytes_before_immediates:]
 
-        if logging.getLogger().isEnabledFor(logging.DEBUG):
+        if self.logger.isEnabledFor(logging.DEBUG):
             logging.debug(
                 "PC {:02X}: {:12} -- {}".format(
                     self.register_program_counter.get(),
