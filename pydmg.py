@@ -46,7 +46,7 @@ class PyDMG:
                 time_to_sleep = DMG_SECONDS_PER_CLOCK - self.time_since_last_cycle()
                 if time_to_sleep > 0:
                     time.sleep(time_to_sleep)
-        self.last_cycle_start_time = time.monotonic()
+            self.last_cycle_start_time = time.monotonic()
         # First increase, then run as first instruction needs cycles to run
         self.total_clock_cycles_ran += 1
         self.lcd.clock()
