@@ -64,8 +64,10 @@ if __name__ == "__main__":
     print("PyDMG starting")
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("cartridge_romfile")
-    parser.add_argument("--boot-romfile", default="dmg_boot.bin")
+    parser.add_argument("cartridge_romfile", help="The cartridge ROM to be run.")
+    parser.add_argument("--boot-romfile", default="dmg_boot.bin",
+                        help="Specifies the boot ROM. This is the first code the DMG will run. The original DMG ROM "
+                             "has been dumped an can be easily found.")
     parser.add_argument("--log-level",
                         default=logging._levelToName[logging.INFO],
                         choices=(
@@ -75,8 +77,10 @@ if __name__ == "__main__":
                             logging._levelToName[logging.ERROR],
                             logging._levelToName[logging.CRITICAL],
                         ))
-    parser.add_argument("--disable-clock", action='store_true')
-    parser.add_argument("--debugger", action='store_true')
+    parser.add_argument("--disable-clock", action='store_true',
+                        help="Disables the clocking mechanism, letting the DMG run at unlimited speed.")
+    parser.add_argument("--debugger", action='store_true',
+                        help="Start the emulator in debugger mode.")
     args = parser.parse_args()
 
     logging.basicConfig(level=logging.DEBUG if args.debugger
