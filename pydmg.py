@@ -11,6 +11,8 @@ from sound import Sound
 
 DMG_CLOCK_FREQUENCY = 4194304
 DMG_SECONDS_PER_CLOCK = 1 / DMG_CLOCK_FREQUENCY
+DMG_CPU_STEP_FREQUENCY = DMG_CLOCK_FREQUENCY / 4  # All DMG instructions take 4*n crystal cycles
+DMG_SECONDS_PER_CPU_STEP = 1 / DMG_CPU_STEP_FREQUENCY
 
 
 class PyDMG:
@@ -79,6 +81,8 @@ if __name__ == "__main__":
                         ))
     parser.add_argument("--disable-clock", action='store_true',
                         help="Disables the clocking mechanism, letting the DMG run at unlimited speed.")
+    parser.add_argument("--disable-renderer", action='store_true',
+                        help="Disables rendering, useful for faster testing.")
     parser.add_argument("--debugger", action='store_true',
                         help="Start the emulator in debugger mode.")
     args = parser.parse_args()
@@ -90,7 +94,7 @@ if __name__ == "__main__":
         boot_romfile_path=args.boot_romfile,
         cartridge_romfile_path=args.cartridge_romfile,
         clocked=not args.disable_clock,
-        renderer=True,
+        renderer=not args.disable_renderer,
     )
 
     if not args.debugger:
