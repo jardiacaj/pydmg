@@ -21,8 +21,7 @@ class DMGMemory:
         self.cartridge_rom = MemoryZoneCartridgeRom(
             'cartridge ROM', size=0x8000, base_address=0x0000, is_rom=True)
         self.video_ram = MemoryZone(
-            'video RAM', size=0x2000, base_address=0x8000,
-            is_implemented=False)
+            'video RAM', size=0x2000, base_address=0x8000)
         self.external_ram = MemoryZone(
             'external RAM', size=0x2000, base_address=0xA000,
             is_implemented=False)
