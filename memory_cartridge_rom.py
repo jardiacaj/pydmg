@@ -1,11 +1,9 @@
 import logging
 
 from binreader import bytes_from_file
-
-
-# CODE: name, supported
 from memory_zone import MemoryZone
 
+# CODE: name, supported
 CARTRIDGE_TYPES = {
     0x00: ("ROM ONLY", True),
     0x01: ("ROM+MBC1", False),

@@ -41,6 +41,7 @@ def draw_horizontal_line(screen, y, length, color):
     for i in range(length):
         screen[i][y] = color
 
+
 class LCDRenderer:
     def __init__(self, lcd):
         self.lcd = lcd
@@ -52,7 +53,6 @@ class LCDRenderer:
 
         pygame.init()
         self.screen = pygame.display.set_mode(self.tile_window_size)
-
 
     def render(self):
         logging.debug("Rendering frame")
@@ -77,7 +77,6 @@ class LCDRenderer:
             draw_vertical_line(screenarray, i*9-1, self.tile_window_size[1], 255)
         for i in range(1, math.ceil(192 / self.tiles_per_row_in_tile_window)):
             draw_horizontal_line(screenarray, i*9-1, self.tile_window_size[0], 255)
-
 
         pygame.surfarray.blit_array(self.screen, screenarray)
         pygame.display.flip()
