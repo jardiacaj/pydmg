@@ -47,6 +47,7 @@ class DMGMemory:
 
     def load_boot_rom(self, boot_romfile_path):
         print("Reading boot ROM {}".format(boot_romfile_path))
+        address = 0
         for address, rom_byte in enumerate(bytes_from_file(boot_romfile_path)):
             self.boot_rom.data[address] = rom_byte
         loaded_byte_count = address + 1
