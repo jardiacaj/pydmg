@@ -8,6 +8,8 @@ from memory_mapped_io import MemoryMappedIO
 # CODE: name, supported
 from memory_zone import MemoryZone, MemoryFault
 
+BOOT_ROM_SIZE = 0x100
+
 
 class DMGMemory:
     def __init__(self,
@@ -17,7 +19,7 @@ class DMGMemory:
                  cartridge_romfile_path=None,
                  ):
         self.boot_rom = MemoryZone(
-            'boot ROM', size=0x0100, base_address=0x0000, is_rom=True)
+            'boot ROM', size=BOOT_ROM_SIZE, base_address=0x0000, is_rom=True)
         self.cartridge_rom = MemoryZoneCartridgeRom(
             'cartridge ROM', size=0x8000, base_address=0x0000, is_rom=True)
         self.video_ram = MemoryZone(
@@ -47,7 +49,10 @@ class DMGMemory:
         print("Reading boot ROM {}".format(boot_romfile_path))
         for address, rom_byte in enumerate(bytes_from_file(boot_romfile_path)):
             self.boot_rom.data[address] = rom_byte
-        logging.debug("Loaded {} boot rom bytes".format(address+1))
+        loaded_byte_count = address + 1
+        logging.debug("Loaded {} boot rom bytes".format(loaded_byte_count))
+        if loaded_byte_count != BOOT_ROM_SIZE:
+            logging.error("Bad boot ROM size, should be 0x{:04x} but is 0x{:04x}")
 
     def address_to_memory(self, address):
         if address > 0xFFFF:
@@ -68,7 +73,7 @@ class DMGMemory:
             return self.external_ram
         if address >= self.video_ram.base_address:
             return self.video_ram
-        if address > len(self.boot_rom.data):
+        if address > BOOT_ROM_SIZE:
             return self.cartridge_rom
         if address >= 0:
             return self.boot_rom if self.boot_rom.is_enabled else self.cartridge_rom
